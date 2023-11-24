@@ -2,8 +2,20 @@ const User = require("../models/user.model.js");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const nodemailer = require("nodemailer");
+// mail gun
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+
+// const nodemailer = require("nodemailer");
 dotenv.config();
+
+// mailgun
+
+const API_KEY = process.env.MAILGUN_API_KEY;
+const DOMAIN = "sandbox62002956fcbf473f98ddf63459fd156f.mailgun.org";
+
+const mailgun = new Mailgun(formData);
+const client = mailgun.client({ username: "api", key: API_KEY });
 
 // register
 const register = async (req, res) => {
@@ -71,32 +83,44 @@ const resetPassword = async (req, res) => {
     // set resetLink to the api route to update new password
     const resetLink = `http://localhost:8000/api/auth/update-password/${resetToken}`;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      auth: {
-        user: process.env.USER_EMAIL,
-        pass: process.env.USER_PASS,
-      },
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: "smtp.ethereal.email",
+    //   port: 587,
+    //   auth: {
+    //     user: process.env.USER_EMAIL,
+    //     pass: process.env.USER_PASS,
+    //   },
+    // });
 
-    const mailOptions = {
-      from: email,
-      // add email address on which you want to send
-      to: email,
-      subject: "Password Reset",
-      text: `Click the following link to reset your password: ${resetLink}`,
+    // const mailOptions = {
+    //   from: email,
+    //   // add email address on which you want to send
+    //   to: email,
+    //   subject: "Password Reset",
+    //   text: `Click the following link to reset your password: ${resetLink}`,
+    // };
+
+    // transporter.sendMail(mailOptions, (error, info) => {
+    //   if (error) {
+    //     console.log(error);
+    //     return res.status(500).json("Email could not be sent" + error);
+    //   } else {
+    //     console.log("Email sent: " + info.response);
+    //     return res.status(200).json("Password reset email sent");
+    //   }
+    // });
+
+    // mailgun
+    const messageData = {
+      from: "sanjeev@rudrainnovative.in",
+      to: "sanjeev@rudrainnovative.in", // sent it to email -- first register to
+      subject: "Reset password request",
+      text: `click to this link to reset your password ${resetLink}`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        return res.status(500).json("Email could not be sent" + error);
-      } else {
-        console.log("Email sent: " + info.response);
-        return res.status(200).json("Password reset email sent");
-      }
-    });
+    await client.messages.create(DOMAIN, messageData);
+
+    res.status(200).json(user);
   } catch (err) {
     console.error(err);
     res.status(500).json("Internal server error" + err);
@@ -107,10 +131,22 @@ const resetPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
   try {
     const { token } = req.params;
-    const { newPassword } = req.body;
 
-    // Verify the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SEC);
+    // Verify the token from the cookie
+    const resetToken = req.cookies.resettoken;
+
+    if (!resetToken) {
+      return res.status(401).json("Token not found in cookie");
+    }
+
+    const decodedToken = jwt.verify(
+      resetToken,
+      process.env.JWT_SEC,
+      (err, user) => {
+        if (err) return res.status(403).json("Token is invalid");
+        req.user = user;
+      }
+    );
 
     // Find the user using the decoded token
     const user = await User.findById(decodedToken._id);
@@ -120,17 +156,30 @@ const updatePassword = async (req, res) => {
     }
 
     // Update the user's password
-    user.password = newPassword;
+    user.password = CryptoJS.AES.encrypt(
+      req.body.newPassword,
+      process.env.AES_SEC
+    );
     await user.save();
 
     // You might want to invalidate the token here or mark it as used
 
     // Respond with a success message
-    res.status(200).json("Password reset successful");
+    const messageData = {
+      from: "sanjeev@rudrainnovative.in",
+      to: "sanjeev@rudrainnovative.in",
+      subject: "Password reset successfully...",
+      text: "You have reset your password successfully!",
+    };
+
+    await client.messages.create(DOMAIN, messageData);
+    res.status(200).json("Password reset successful!");
   } catch (err) {
     console.error(err);
     res.status(500).json("Internal server error" + err);
   }
 };
+// logout
+// const logout = (req, res) => {};
 
 module.exports = { register, login, resetPassword, updatePassword };

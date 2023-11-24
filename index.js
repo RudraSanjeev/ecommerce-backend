@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const { default: mongoose } = require("mongoose");
 const authRoute = require("./routes/auth.route.js");
-
+const cookieParser = require("cookie-parser");
 const app = express();
 dotenv.config();
 // utils
@@ -16,6 +16,7 @@ mongoose
   .catch((err) => console.error("db connection failed: " + err));
 
 // middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
 
