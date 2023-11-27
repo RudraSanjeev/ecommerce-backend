@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
     //   type: [addressSchema],
     //   required: [true, "address must be of user !"],
     // },
-    resetPasswordToken: {
+    passwordResetToken: {
       type: String,
       default: null,
     },

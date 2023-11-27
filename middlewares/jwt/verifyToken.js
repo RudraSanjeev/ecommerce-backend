@@ -1,39 +1,43 @@
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
-
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-    jwt.verify(token, process.env.JWT_SEC, (err, user) => {
-      if (err) res.status(403).json("invalid token ");
+
+    jwt.verify(token, process.env.JWT_TOKEN_SEC, (err, user) => {
+      if (err) {
+        return res.status(403).json("token validation failed !");
+      }
       req.user = user;
       next();
     });
   } else {
-    res.status(401).json("you are not authenticated");
+    return res.status(401).json("You are not authenticated !");
   }
 };
 
 const verifyAndAuthorize = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.id === req.params.id || req.user.isAdmin) {
+    if (req.user._id === req.params.userId || req.user.role.admin) {
       next();
     } else {
-      res.status(403).json("you are not allow to do that.");
+      return res.status(403).json("You are not allow to do this !");
     }
   });
 };
 
-// for product and user { only admin can add new product and user.}
-const verifyTokenAndAdmin = (req, res, next) => {
+const verifyAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.isAdmin) {
+    if (req.user.role.admin) {
       next();
     } else {
-      res.status(403).json("you are not allow to do that.");
+      return res.status(403).json("Only admin can person this task !");
     }
   });
 };
 
-module.exports = { verifyToken, verifyAndAuthorize, verifyTokenAndAdmin };
+module.exports = { verifyToken, verifyAndAuthorize, verifyAndAdmin };

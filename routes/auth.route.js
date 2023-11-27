@@ -1,21 +1,24 @@
-const router = require("express").Router();
 const {
   register,
   login,
-  updatePassword,
+  logout,
   resetPassword,
-} = require("../controllers/auth.controller.js");
+  updatePassword,
+} = require("../controllers/auth.controller");
 
-// register
+const router = require("express").Router();
+
+//register
 router.post("/register", register);
-
-// login
+//login
 router.post("/login", login);
+// logout
+router.post("/logout", logout);
 
-// reset
-router.post("/reset", resetPassword);
+// reset password
+router.post("/reset-password", resetPassword);
 
-// update password
-router.patch("/update-password/:token", updatePassword);
+// update password - using reset password link
+router.post("/update-password/:resetToken", updatePassword);
 
 module.exports = router;
