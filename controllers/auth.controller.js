@@ -2,6 +2,10 @@ const User = require("../models/user.model.js");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const {
+  generateToken,
+  refreshToken,
+} = require("../middlewares/jwt/generateToken.js");
 // mail gun
 const formData = require("form-data");
 const Mailgun = require("mailgun.js");
@@ -12,7 +16,7 @@ dotenv.config();
 // mailgun
 
 const API_KEY = process.env.MAILGUN_API_KEY;
-const DOMAIN = "sandbox62002956fcbf473f98ddf63459fd156f.mailgun.org";
+const DOMAIN = process.env.MAILGUN_DOMAIN;
 
 const mailgun = new Mailgun(formData);
 const client = mailgun.client({ username: "api", key: API_KEY });
@@ -21,8 +25,7 @@ const client = mailgun.client({ username: "api", key: API_KEY });
 const register = async (req, res) => {
   try {
     const newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
+      ...req.body,
       password: CryptoJS.AES.encrypt(req.body.password, process.env.AES_SEC),
     });
     const savedUser = await newUser.save();
@@ -35,10 +38,10 @@ const register = async (req, res) => {
 // login
 const login = async (req, res) => {
   try {
-    const getUser = await User.findOne({ email: req.body.email });
-    !getUser && res.status(401).json("No user find with this email");
+    const user = await User.findOne({ email: req.body.email });
+    !user && res.status(401).json("No user find with this email");
 
-    const { password, ...otherInfo } = getUser._doc;
+    const { password, ...otherInfo } = user._doc;
     const originalPassword = CryptoJS.AES.decrypt(
       password,
       process.env.AES_SEC
@@ -46,11 +49,10 @@ const login = async (req, res) => {
     originalPassword !== req.body.password &&
       res.status(401).json("password doesn't match !");
 
-    const generateToken = jwt.sign({ _id: getUser._id }, process.env.JWT_SEC, {
-      expiresIn: "5d",
-    });
+    const accessToken = generateToken(user);
+    const refreshedToken = refreshToken(user);
 
-    res.status(200).json({ ...otherInfo, generateToken });
+    res.status(200).json({ ...otherInfo, accessToken, refreshedToken });
   } catch (err) {
     res.status(500).json("Internal server error" + err);
   }
