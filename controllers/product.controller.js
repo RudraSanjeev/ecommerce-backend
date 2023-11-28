@@ -1,8 +1,3 @@
-const {
-  verifyToken,
-  verifyAndAuthorize,
-  verifyAndAdmin,
-} = require("../middlewares/jwt/verifyToken");
 const Product = require("../models/product.model.js");
 
 const { uploadToCloudinary } = require("../utils/storage.js");
@@ -22,7 +17,7 @@ const addProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
+      req.params.productId,
       { $set: req.body },
       { new: true }
     );
@@ -58,7 +53,7 @@ const getAllProduct = async (req, res) => {
   try {
     const products = await Product.find();
 
-    res.status(201).json(products);
+    res.status(200).json(products);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -69,7 +64,7 @@ const searchAllMatchingProduct = async (req, res) => {
   const { keyword } = req.query;
 
   try {
-    const results = await User.find({
+    const results = await Product.find({
       $or: [
         { title: { $regex: keyword, $options: "i" } },
         { desc: { $regex: keyword, $options: "i" } },

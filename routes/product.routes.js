@@ -1,4 +1,4 @@
-const { verifyAndAdmin } = require("../middlewares/jwt/verifyToken");
+const { verifyAndAdmin } = require("../middlewares/jwt/verifyToken.js");
 const router = require("express").Router();
 const {
   addProduct,
@@ -12,16 +12,17 @@ const {
 router.post("/add", verifyAndAdmin, addProduct);
 
 // update
-router.put("/update/:productId", verifyAndAdmin, updateProduct);
+router.patch("/update/:productId", verifyAndAdmin, updateProduct);
 
 // delete
 router.delete("/delete/:id", verifyAndAdmin, deleteProduct);
 
 // get a product
-router.get("/:id", getProduct);
-
-// get a product
-router.get("/all", getAllProduct);
+router.get("/findAll", getAllProduct);
 
 // searching all matching product
 router.get("/search", searchAllMatchingProduct);
+
+// get a product
+router.get("/:productId", getProduct);
+module.exports = router;
