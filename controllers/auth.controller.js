@@ -1,58 +1,85 @@
 const User = require("../models/user.model.js");
+const dotenv = require("dotenv");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-// mail gun
-const formData = require("form-data");
-const Mailgun = require("mailgun.js");
-
-// const nodemailer = require("nodemailer");
+const { sendNotification } = require("../middlewares/mailgun/sendMail.js");
+const {
+  generateToken,
+  generateRefreshToken,
+  generateResetToken,
+} = require("../middlewares/jwt/generateToken.js");
 dotenv.config();
-
-// mailgun
-
-const API_KEY = process.env.MAILGUN_API_KEY;
-const DOMAIN = "sandbox62002956fcbf473f98ddf63459fd156f.mailgun.org";
-
-const mailgun = new Mailgun(formData);
-const client = mailgun.client({ username: "api", key: API_KEY });
 
 // register
 const register = async (req, res) => {
   try {
     const newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
+      ...req.body,
       password: CryptoJS.AES.encrypt(req.body.password, process.env.AES_SEC),
     });
     const savedUser = await newUser.save();
+    const subject = `registration confirmation !`;
+
+    const test = `
+        Hi, ${savedUser.username}, \n You have been registered successfully !
+      `;
+    sendNotification(savedUser.email, savedUser.email, subject, test);
     res.status(201).json(savedUser);
   } catch (err) {
-    res.status(500).json("Internal server error" + err);
+    res.status(500).json(err);
   }
 };
 
 // login
 const login = async (req, res) => {
   try {
-    const getUser = await User.findOne({ email: req.body.email });
-    !getUser && res.status(401).json("No user find with this email");
-
-    const { password, ...otherInfo } = getUser._doc;
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json("User not found !");
+    }
     const originalPassword = CryptoJS.AES.decrypt(
-      password,
+      user.password,
       process.env.AES_SEC
     ).toString(CryptoJS.enc.Utf8);
-    originalPassword !== req.body.password &&
-      res.status(401).json("password doesn't match !");
+    if (originalPassword !== req.body.password) {
+      return res.status(401).json("password is incorrect !");
+    }
+    const token = generateToken(user);
+    const refreshtoken = generateRefreshToken(user);
+    user.refreshToken = refreshtoken;
+    await user.save();
 
-    const generateToken = jwt.sign({ _id: getUser._id }, process.env.JWT_SEC, {
-      expiresIn: "5d",
-    });
+    res.cookie("accessToken", token, { httpOnly: true, maxAge: "3600000" });
 
-    res.status(200).json({ ...otherInfo, generateToken });
+    const { password, ...otherInfo } = user._doc;
+
+    res.status(200).json({ ...otherInfo, token });
   } catch (err) {
-    res.status(500).json("Internal server error" + err);
+    res.status(500).json("Internal server error " + err);
+  }
+};
+
+// logout
+const logout = async (req, res) => {
+  try {
+    const accessToken = req.cookies.accessToken;
+    if (!accessToken) {
+      return res.status(401).json("accesstoken is not provided !");
+    }
+
+    const decodedToken = jwt.verify(accessToken, process.env.JWT_TOKEN_SEC);
+    const userId = decodedToken._id;
+
+    const user = await User.findById(userId);
+
+    user.refreshToken = null;
+    await user.save();
+
+    res.clearCookie("accessToken");
+
+    res.status(200).json("User has been logged out successfully!");
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error");
   }
 };
 
@@ -61,125 +88,65 @@ const resetPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // Find the user by email
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json("User not found");
     }
 
-    // Generate a reset token with an expiration (e.g., 1 hour)
-    const resetToken = jwt.sign({ _id: user._id }, process.env.JWT_SEC, {
-      expiresIn: "10m",
-    });
+    const resetToken = generateResetToken(user);
+    console.log(resetToken);
 
-    // Store the reset token in the user's document
-    // user.resetToken = resetToken;
-    // await user.save();
-    // set token in the cookie not in db
-    res.cookie("resetToken", resetToken, { httpOnly: true, maxAge: 600000 });
-
-    // Send a reset password email
-    // set resetLink to the api route to update new password
     const resetLink = `http://localhost:8000/api/auth/update-password/${resetToken}`;
 
-    // const transporter = nodemailer.createTransport({
-    //   host: "smtp.ethereal.email",
-    //   port: 587,
-    //   auth: {
-    //     user: process.env.USER_EMAIL,
-    //     pass: process.env.USER_PASS,
-    //   },
-    // });
-
-    // const mailOptions = {
-    //   from: email,
-    //   // add email address on which you want to send
-    //   to: email,
-    //   subject: "Password Reset",
-    //   text: `Click the following link to reset your password: ${resetLink}`,
-    // };
-
-    // transporter.sendMail(mailOptions, (error, info) => {
-    //   if (error) {
-    //     console.log(error);
-    //     return res.status(500).json("Email could not be sent" + error);
-    //   } else {
-    //     console.log("Email sent: " + info.response);
-    //     return res.status(200).json("Password reset email sent");
-    //   }
-    // });
-
     // mailgun
-    const messageData = {
-      from: "sanjeev@rudrainnovative.in",
-      to: "sanjeev@rudrainnovative.in", // sent it to email -- first register to
-      subject: "Reset password request",
-      text: `click to this link to reset your password ${resetLink}`,
-    };
-
-    await client.messages.create(DOMAIN, messageData);
-
-    res.status(200).json(user);
+    const text = `Click here to reset your password ${resetLink}`;
+    sendNotification(user.email, user.email, "Reset password", text);
+    res.status(200).json("Reset mail has been sent to your email");
   } catch (err) {
-    console.error(err);
-    res.status(500).json("Internal server error" + err);
+    res.status(500).json(err.message || "Internal sever error !");
   }
 };
 
-// update password
 const updatePassword = async (req, res) => {
   try {
-    const { token } = req.params;
-
-    // Verify the token from the cookie
-    const resetToken = req.cookies.resettoken;
+    const { resetToken } = req.params;
 
     if (!resetToken) {
-      return res.status(401).json("Token not found in cookie");
+      return res.status(401).json("Token not found in params");
     }
 
     const decodedToken = jwt.verify(
       resetToken,
-      process.env.JWT_SEC,
-      (err, user) => {
-        if (err) return res.status(403).json("Token is invalid");
-        req.user = user;
-      }
+      process.env.JWT_RESET_TOKEN_SEC
     );
 
-    // Find the user using the decoded token
     const user = await User.findById(decodedToken._id);
 
     if (!user) {
       return res.status(404).json("User not found");
     }
 
-    // Update the user's password
     user.password = CryptoJS.AES.encrypt(
-      req.body.newPassword,
+      req.body.password,
       process.env.AES_SEC
     );
+
     await user.save();
 
-    // You might want to invalidate the token here or mark it as used
+    // Send a notification to the user
+    sendNotification(
+      user.email,
+      user.email,
+      "Password updation",
+      "Your password has been updated successfully!"
+    );
 
-    // Respond with a success message
-    const messageData = {
-      from: "sanjeev@rudrainnovative.in",
-      to: "sanjeev@rudrainnovative.in",
-      subject: "Password reset successfully...",
-      text: "You have reset your password successfully!",
-    };
-
-    await client.messages.create(DOMAIN, messageData);
-    res.status(200).json("Password reset successful!");
+    res.status(200).json("Password updated successfully!");
   } catch (err) {
     console.error(err);
-    res.status(500).json("Internal server error" + err);
+    res.status(500).json(err.message || "Internal server error");
   }
 };
-// logout
-// const logout = (req, res) => {};
 
-module.exports = { register, login, resetPassword, updatePassword };
+module.exports = { register, login, logout, resetPassword, updatePassword };
