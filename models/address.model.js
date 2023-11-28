@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
+const User = require("./user.model.js");
 
 const addressSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     houseNo: {
       type: String,
       required: [true, "Please enter your house name/no"],

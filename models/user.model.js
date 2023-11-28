@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// const addressSchema = require("./address.model.js");
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -41,10 +41,6 @@ const userSchema = new mongoose.Schema(
       default: "buyer",
       required: [true, "please select your role !"],
     },
-    // address: {
-    //   type: [addressSchema],
-    //   required: [true, "address must be of user !"],
-    // },
     passwordResetToken: {
       type: String,
       default: null,

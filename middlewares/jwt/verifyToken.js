@@ -22,7 +22,7 @@ const verifyToken = (req, res, next) => {
 
 const verifyAndAuthorize = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user._id === req.params.userId || req.user.role.admin) {
+    if (req.user._id === req.params.userId || req.user.role == "admin") {
       next();
     } else {
       return res.status(403).json("You are not allow to do this !");
@@ -32,7 +32,7 @@ const verifyAndAuthorize = (req, res, next) => {
 
 const verifyAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.role.admin) {
+    if (req.user.role == "admin") {
       next();
     } else {
       return res.status(403).json("Only admin can person this task !");

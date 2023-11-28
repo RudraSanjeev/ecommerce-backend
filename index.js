@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const { default: mongoose } = require("mongoose");
 const authRoute = require("./routes/auth.route.js");
+const productRoute = require("./routes/product.routes.js");
 const cookieParser = require("cookie-parser");
 const app = express();
 dotenv.config();
@@ -19,6 +20,7 @@ mongoose
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
+app.use("/api/product", productRoute);
 
 // server
 app.listen(PORT, () => {

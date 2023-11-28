@@ -21,12 +21,12 @@ const register = async (req, res) => {
     const subject = `registration confirmation !`;
 
     const test = `
-        Hi, ${savedUser.username}, \n You have been registered successfully !
+        Hi, ${savedUser.firstName}, \n You have been registered successfully !
       `;
     sendNotification(savedUser.email, savedUser.email, subject, test);
     res.status(201).json(savedUser);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json(err.message || "Internal server error !");
   }
 };
 
@@ -55,7 +55,7 @@ const login = async (req, res) => {
 
     res.status(200).json({ ...otherInfo, token });
   } catch (err) {
-    res.status(500).json("Internal server error " + err);
+    res.status(500).json(err.message || "Internal server error !");
   }
 };
 
