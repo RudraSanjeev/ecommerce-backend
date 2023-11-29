@@ -9,12 +9,7 @@ const productSchema = mongoose.Schema({
     type: String,
     required: [true, "Please enter description of the product !"],
   },
-  img: [
-    {
-      type: String,
-      required: [true, "Please add at lease one image url !"],
-    },
-  ],
+  img: Array,
   currency: {
     type: String,
     enum: ["INR", "USD", "EURO"],

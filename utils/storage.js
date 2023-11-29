@@ -22,5 +22,12 @@ const uploadImageToCloudinary = async (filePath) => {
   }
 };
 
-module.exports = uploadImageToCloudinary;
-// const imagePath = path.join(__dirname, "./assets/nikeShoes.webp");
+const imageUrl = async (imagePath) => {
+  try {
+    const result = await uploadImageToCloudinary(imagePath);
+    return result;
+  } catch (err) {
+    console.log("error" + err);
+  }
+};
+module.exports = imageUrl;

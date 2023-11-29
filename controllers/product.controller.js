@@ -1,11 +1,15 @@
 const Product = require("../models/product.model.js");
-
-const { uploadToCloudinary } = require("../utils/storage.js");
+const path = require("path");
+const imageUrl = require("../utils/storage.js");
 
 // create
 const addProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const imagePath = path.join(__dirname, "../utils/assets/nikeShoes.webp");
+    // here you can make multiple imagePath and pass as an array
+    const images = await imageUrl(imagePath);
+
+    const product = new Product({ ...req.body, img: [images] });
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);
   } catch (err) {
