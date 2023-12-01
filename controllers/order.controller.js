@@ -1,22 +1,56 @@
 const Order = require("../models/order.model.js");
+const Cart = require("../models/cart.model.js");
+const Address = require("../models/address.model.js");
+const stripe = require("stripe")(process.env.STRIPE_SEC);
 
 //CREATE
 const addOrder = async (req, res) => {
-  const newOrder = new Order(req.body);
-
   try {
-    const savedOrder = await newOrder.save();
-    res.status(201).json(savedOrder);
+    const userId = req.user._id;
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+    if (!cart) {
+      return res.status(404).json("No item in the cart!");
+    }
+
+    const address = await Address.findOne({ userId });
+
+    if (!address) {
+      return res.status(404).json("Please add your address to place an order!");
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: cart.totalPrice,
+      currency: cart.items[0].productId.currency,
+      // Add any additional options as needed
+    });
+
+    if (!paymentIntent) {
+      return res.status(400).json("payment not been done !");
+    }
+    // Create a new order with the paymentIntent id
+    const newOrder = new Order({
+      ...req.body,
+      userId,
+      cart: cart._id,
+      total: cart.totalPrice,
+      paymentToken: paymentIntent.id,
+      paymentStatus: "success",
+    });
+
+    await newOrder.save();
+
+    res
+      .status(201)
+      .json({ newOrder, cart, clientSecret: paymentIntent.client_secret });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json(err.message || "Internal server error!");
   }
 };
-
-//UPDATE
 const updateOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
+      req.params.orderId,
       {
         $set: req.body,
       },
@@ -51,7 +85,8 @@ const getUserOrderByOrderId = async (req, res) => {
 //GET USER ORDERS
 const getUserOrderByUserId = async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.params.userId });
+    const userId = req.user._id;
+    const orders = await Order.findOne({ userId });
     res.status(200).json(orders);
   } catch (err) {
     res.status(500).json(err);

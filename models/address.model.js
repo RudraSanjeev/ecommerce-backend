@@ -3,7 +3,7 @@ const User = require("./user.model.js");
 
 const addressSchema = new mongoose.Schema(
   {
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },

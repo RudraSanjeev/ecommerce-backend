@@ -1,12 +1,15 @@
 const {
   verifyToken,
   verifyAndAuthorize,
+  verifyAndAdmin,
 } = require("../middlewares/jwt/verifyToken.js");
 const router = require("express").Router();
 const {
   addCart,
   updatedCart,
   deletedCart,
+  getCart,
+  getAllCart,
 } = require("../controllers/cart.controller.js");
 // add
 router.post("/add", verifyToken, addCart);
@@ -14,16 +17,13 @@ router.post("/add", verifyToken, addCart);
 // update
 router.patch("/update/:productId", verifyAndAuthorize, updatedCart);
 
-// // delete
+// delete
 router.delete("/delete/:cartId", verifyAndAuthorize, deletedCart);
 
-// // get all  user cart
-// router.get("/allUser/:cartId", verifyAndAuthorize, getAllUserCart);
+// get single user cart
+router.get("/", verifyAndAuthorize, getCart);
 
 // // get all cart
-// router.get("/all/:cartId", verifyAndAuthorize, getAllCart);
-
-// // get a user cart
-// router.get("/:cartId", verifyAndAuthorize, getUserCart);
+router.get("/all", verifyAndAdmin, getAllCart);
 
 module.exports = router;

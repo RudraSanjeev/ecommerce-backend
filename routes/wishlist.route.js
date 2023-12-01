@@ -5,20 +5,16 @@ const {
 const router = require("express").Router();
 const {
   addWishList,
-  deleteWishList,
-  getUserWishlistByUserId,
-  getUserWishlistByWishlistId,
+  updateWishlist,
+  getWishList,
 } = require("../controllers/wishlist.controller.js");
 // add
-router.post("/add", verifyToken, addWishList);
+router.post("/add", verifyAndAuthorize, addWishList);
 
 // delete
-router.delete("/delete/:wishlistId", verifyAndAuthorize, deleteWishList);
+router.patch("/update/:productId", verifyAndAuthorize, updateWishlist);
 
 // get  order by userid
-router.get("/:userId", verifyAndAuthorize, getUserWishlistByUserId);
-
-// get  order by userid
-router.get("/:wishlistId", verifyAndAuthorize, getUserWishlistByWishlistId);
+router.get("/", verifyAndAuthorize, getWishList);
 
 module.exports = router;

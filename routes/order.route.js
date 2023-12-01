@@ -13,7 +13,7 @@ const {
   getAllOrder,
 } = require("../controllers/order.controller.js");
 // add
-router.post("/add", verifyToken, addOrder);
+router.post("/add", verifyAndAuthorize, addOrder);
 
 // update
 router.patch("/update/:cartId", verifyAndAuthorize, updateOrder);

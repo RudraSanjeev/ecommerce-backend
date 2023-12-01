@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const addressSchema = require("./address.model.js");
+const Address = require("./address.model.js");
 const orderSchema = new mongoose.Schema(
   {
     userId: {
@@ -17,14 +17,14 @@ const orderSchema = new mongoose.Schema(
       required: [true, "order must have total value !"],
       default: 0,
     },
-    address: {
-      type: addressSchema,
-      required: [true, "order must have address !"],
-    },
     paymentMode: {
       type: String,
       enum: ["Credit Card", "Debit Card", "Cash on delivery"],
       required: [true, "please one of the method to make payment"],
+    },
+    paymentToken: {
+      type: String,
+      required: true,
     },
     paymentStatus: {
       type: String,
@@ -34,10 +34,11 @@ const orderSchema = new mongoose.Schema(
     orderStatus: {
       type: String,
       enum: ["pending", "successfull", "delivered", "cancelled"],
-      required: [true, "Please make payment to place an order !"],
+      // required: [true, "Please make payment to place an order !"],
+      default: "pending",
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.module("Order", orderSchema);
+module.exports = mongoose.model("Order", orderSchema);
