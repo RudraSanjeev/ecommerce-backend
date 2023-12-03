@@ -12,7 +12,7 @@ const productSchema = mongoose.Schema({
   img: Array,
   currency: {
     type: String,
-    enum: ["INR", "USD", "EURO"],
+    enum: ["INR", "USD", "EUR"],
     default: "INR",
   },
   price: {

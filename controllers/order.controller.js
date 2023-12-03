@@ -2,7 +2,8 @@ const Order = require("../models/order.model.js");
 const Cart = require("../models/cart.model.js");
 const Address = require("../models/address.model.js");
 const stripe = require("stripe")(process.env.STRIPE_SEC);
-
+const User = require("../models/user.model.js");
+const { sendNotification } = require("../middlewares/nodemailer/sendMail.js");
 //CREATE
 const addOrder = async (req, res) => {
   try {
@@ -39,7 +40,14 @@ const addOrder = async (req, res) => {
     });
 
     await newOrder.save();
+    await Cart.findByIdAndDelete(cart._id);
 
+    sendNotification(
+      process.env.GMAIL_USER,
+      email,
+      "Order confirmed !",
+      `You have successfully place and order !`
+    );
     res
       .status(201)
       .json({ newOrder, cart, clientSecret: paymentIntent.client_secret });
@@ -47,6 +55,7 @@ const addOrder = async (req, res) => {
     res.status(500).json(err.message || "Internal server error!");
   }
 };
+
 const updateOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(

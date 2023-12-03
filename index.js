@@ -8,6 +8,7 @@ const wishlistRoute = require("./routes/wishlist.route.js");
 const orderRoute = require("./routes/order.route.js");
 const addressRoute = require("./routes/address.route.js");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const app = express();
 dotenv.config();
 // utils
@@ -21,6 +22,7 @@ mongoose
   .catch((err) => console.error("db connection failed: " + err));
 
 // middleware
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);

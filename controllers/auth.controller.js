@@ -2,7 +2,7 @@ const User = require("../models/user.model.js");
 const dotenv = require("dotenv");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const { sendNotification } = require("../middlewares/mailgun/sendMail.js");
+const { sendNotification } = require("../middlewares/nodemailer/sendMail.js");
 const {
   generateToken,
   generateRefreshToken,
@@ -23,7 +23,7 @@ const register = async (req, res) => {
     const test = `
         Hi, ${savedUser.firstName}, \n You have been registered successfully !
       `;
-    sendNotification(savedUser.email, savedUser.email, subject, test);
+    sendNotification(process.env.GMAIL_USER, savedUser.email, subject, test);
     res.status(201).json(savedUser);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
@@ -101,7 +101,12 @@ const resetPassword = async (req, res) => {
 
     // mailgun
     const text = `Click here to reset your password ${resetLink}`;
-    sendNotification(user.email, user.email, "Reset password", text);
+    sendNotification(
+      process.env.GMAIL_USER,
+      user.email,
+      "Reset password",
+      text
+    );
     res.status(200).json("Reset mail has been sent to your email");
   } catch (err) {
     res.status(500).json(err.message || "Internal sever error !");
@@ -136,7 +141,7 @@ const updatePassword = async (req, res) => {
 
     // Send a notification to the user
     sendNotification(
-      user.email,
+      process.env.GMAIL_USER,
       user.email,
       "Password updation",
       "Your password has been updated successfully!"
