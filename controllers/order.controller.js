@@ -4,10 +4,14 @@ const Address = require("../models/address.model.js");
 const stripe = require("stripe")(process.env.STRIPE_SEC);
 const User = require("../models/user.model.js");
 const { sendNotification } = require("../middlewares/nodemailer/sendMail.js");
+
 //CREATE
 const addOrder = async (req, res) => {
   try {
     const userId = req.user._id;
+    const user = await User.findById(userId);
+    // console.log(user);
+
     const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     if (!cart) {
@@ -44,7 +48,7 @@ const addOrder = async (req, res) => {
 
     sendNotification(
       process.env.GMAIL_USER,
-      email,
+      user.email,
       "Order confirmed !",
       `You have successfully place and order !`
     );

@@ -28,13 +28,17 @@ const generateRefreshToken = (user) => {
   return token;
 };
 
-const generateRefreshAcessToken = (refreshToken) => {
-  jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SEC, (err, user) => {
-    if (err) {
-      return new Error("token validation failed !");
-    }
-    return generateToken(user);
-  });
+const generateRefreshAcessToken = async (refreshToken) => {
+  try {
+    const user = await jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_TOKEN_SEC
+    );
+    const newAccessToken = generateToken(user);
+    return newAccessToken;
+  } catch (err) {
+    throw new Error("Token validation failed!");
+  }
 };
 
 module.exports = {

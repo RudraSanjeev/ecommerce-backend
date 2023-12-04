@@ -7,6 +7,7 @@ const {
   generateToken,
   generateRefreshToken,
   generateResetToken,
+  generateRefreshAcessToken,
 } = require("../middlewares/jwt/generateToken.js");
 dotenv.config();
 
@@ -154,4 +155,25 @@ const updatePassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, resetPassword, updatePassword };
+const refresAccessToken = async (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  if (!refreshToken) {
+    return res.status(401).json("refresh token is missing !");
+  }
+  const accessToken = await generateRefreshAcessToken(refreshToken);
+  if (!accessToken) {
+    return res.status(401).json("access token is missing !");
+  }
+  res.cookie("accessToken", accessToken, { httpOnly: true, maxAge: "3600000" });
+
+  res.status(200).json(accessToken);
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  resetPassword,
+  updatePassword,
+  refresAccessToken,
+};
