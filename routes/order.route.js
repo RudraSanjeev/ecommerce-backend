@@ -16,7 +16,7 @@ const {
 router.post("/add", verifyAndAuthorize, addOrder);
 
 // update
-router.patch("/update/:cartId", verifyAndAuthorize, updateOrder);
+router.patch("/update/:orderId", verifyAndAdmin, updateOrder);
 
 // delete
 router.delete("/delete/:cartId", verifyAndAdmin, deleteOrder);

@@ -1,8 +1,15 @@
 const User = require("../models/user.model.js");
 const Address = require("../models/address.model.js");
-
+const {
+  addAddressSchema,
+  updateAddressSchema,
+} = require("../validators/address.validator.js");
 const addAddress = async (req, res) => {
   try {
+    const { error } = addAddressSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
     const newAddress = new Address({ ...req.body, userId });
 
@@ -22,6 +29,10 @@ const addAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
+    const { error } = updateAddressSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
     const address = await Address.findOne({ userId });
     if (!address) {

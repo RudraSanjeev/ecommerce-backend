@@ -9,11 +9,20 @@ const {
   generateResetToken,
   generateRefreshAcessToken,
 } = require("../middlewares/jwt/generateToken.js");
+const {
+  registerSchema,
+  loginschema,
+  resetPasswordSchema,
+} = require("../validators/auth.validator.js");
 dotenv.config();
 
 // register
 const register = async (req, res) => {
   try {
+    const { error } = registerSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const newUser = new User({
       ...req.body,
       password: CryptoJS.AES.encrypt(req.body.password, process.env.AES_SEC),
@@ -34,6 +43,10 @@ const register = async (req, res) => {
 // login
 const login = async (req, res) => {
   try {
+    const { error } = loginschema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(404).json("User not found !");
@@ -87,6 +100,10 @@ const logout = async (req, res) => {
 // reset
 const resetPassword = async (req, res) => {
   try {
+    const { error } = resetPasswordSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const { email } = req.body;
 
     const user = await User.findOne({ email });

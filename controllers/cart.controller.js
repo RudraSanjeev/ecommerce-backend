@@ -1,12 +1,20 @@
 const Cart = require("../models/cart.model.js");
 const User = require("../models/user.model.js");
 const Product = require("../models/product.model.js");
-
+const {
+  addCartSchema,
+  updatedCartSchema,
+  deletedCartSchema,
+} = require("../validators/cart.validator.js");
 // add
 const addCart = async (req, res) => {
   try {
+    const { error } = addCartSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
-    // const { productId, quantity } = req.body;
+
     const productId = req.body.items.productId;
     const quantity = req.body.items.quantity;
 
@@ -70,7 +78,12 @@ const addCart = async (req, res) => {
 // update
 const updatedCart = async (req, res) => {
   try {
-    const cartId = req.params.cartId; // Corrected spelling to cartId
+    const { error } = updatedCartSchema.validate(req.params.productId);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+
+    // const cartId = req.params.cartId;
     const productId = req.params.productId;
     const quantity = req.body.quantity;
     const userId = req.user._id;
@@ -119,6 +132,10 @@ const updatedCart = async (req, res) => {
 // delete cart
 const deletedCart = async (req, res) => {
   try {
+    const { error } = deletedCartSchema.validate(req.params.cartId);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const cartId = req.params.cartId;
     const userId = req.user._id;
     const cart = await Cart.findOne({ userId });

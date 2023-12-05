@@ -1,10 +1,21 @@
 const Product = require("../models/product.model.js");
 const path = require("path");
 const imageUrl = require("../utils/storage.js");
-
+const {
+  addProductSchema,
+  updateProductSchema,
+  deleteProductSchema,
+  getProductSchema,
+  searchAllMatchingProductSchema,
+} = require("../validators/product.validator.js");
 // create
 const addProduct = async (req, res) => {
   try {
+    const { error } = addProductSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+
     const imagePath = path.join(__dirname, "../utils/assets/nikeShoes.webp");
     // here you can make multiple imagePath and pass as an array
     const images = await imageUrl(imagePath);
@@ -20,6 +31,10 @@ const addProduct = async (req, res) => {
 // update - product
 const updateProduct = async (req, res) => {
   try {
+    const { error } = updateProductSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.productId,
       { $set: req.body },
@@ -34,6 +49,10 @@ const updateProduct = async (req, res) => {
 // delete - product
 const deleteProduct = async (req, res) => {
   try {
+    const { error } = deleteProductSchema.validate(req.params.productId);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     await Product.findByIdAndDelete(req.params.productId);
     res.status(200).json("Product has been deleted successfully !");
   } catch (err) {
@@ -44,6 +63,10 @@ const deleteProduct = async (req, res) => {
 // find a product
 const getProduct = async (req, res) => {
   try {
+    const { error } = getProductSchema.validate(req.params.productId);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const product = await Product.findById(req.params.productId);
 
     res.status(201).json(product);
@@ -65,6 +88,10 @@ const getAllProduct = async (req, res) => {
 
 // search - all product
 const searchAllMatchingProduct = async (req, res) => {
+  const { error } = searchAllMatchingProductSchema.validate(req.query.keyword);
+  if (error) {
+    return res.status(400).json(error.message || "Bad request !");
+  }
   const { keyword } = req.query;
 
   try {

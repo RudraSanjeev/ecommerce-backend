@@ -1,10 +1,17 @@
 const Wishlist = require("../models/wishlist.model.js");
 const Product = require("../models/product.model.js");
-
+const {
+  addWishListSchema,
+  updateWishlistSchema,
+} = require("../validators/wishlist.validator.js");
 //CREATE
 const addWishList = async (req, res) => {
   // const newWishList = new Wishlist(req.body);
   try {
+    const { error } = addWishListSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
     const productId = req.body.items.productId;
 
@@ -47,6 +54,10 @@ const addWishList = async (req, res) => {
 //update
 const updateWishlist = async (req, res) => {
   try {
+    const { error } = updateWishlistSchema.validate(req.params.productId);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const productId = req.params.productId;
     const userId = req.user._id;
     const wishlist = await Wishlist.findOne({ userId });

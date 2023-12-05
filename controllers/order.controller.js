@@ -4,10 +4,18 @@ const Address = require("../models/address.model.js");
 const stripe = require("stripe")(process.env.STRIPE_SEC);
 const User = require("../models/user.model.js");
 const { sendNotification } = require("../middlewares/nodemailer/sendMail.js");
-
+const {
+  addOrderSchema,
+  updatedOrderSchema,
+  deletedOrderSchema,
+} = require("../validators/order.validation.js");
 //CREATE
 const addOrder = async (req, res) => {
   try {
+    const { error } = addOrderSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
     const user = await User.findById(userId);
     // console.log(user);
@@ -62,6 +70,10 @@ const addOrder = async (req, res) => {
 
 const updateOrder = async (req, res) => {
   try {
+    const { error } = updatedOrderSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.orderId,
       {
@@ -78,7 +90,11 @@ const updateOrder = async (req, res) => {
 //DELETE
 const deleteOrder = async (req, res) => {
   try {
-    await Order.findByIdAndDelete(req.params.id);
+    const { error } = deletedOrderSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    await Order.findByIdAndDelete(req.params.orderId);
     res.status(200).json("Order has been deleted...");
   } catch (err) {
     res.status(500).json(err);
