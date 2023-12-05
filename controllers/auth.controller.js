@@ -10,18 +10,32 @@ const {
   generateRefreshAcessToken,
 } = require("../middlewares/jwt/generateToken.js");
 const {
+<<<<<<< HEAD
   registerSchema,
   loginschema,
   resetPasswordSchema,
+=======
+  registrationSchema,
+  loginSchema,
+  resetPasswordSchema,
+  updatePasswordSchema,
+>>>>>>> a1b71c5 (validator added)
 } = require("../validators/auth.validator.js");
 dotenv.config();
 
 // register
 const register = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { error } = registerSchema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
+=======
+    // Validate the request body
+    const { error } = registrationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+>>>>>>> a1b71c5 (validator added)
     }
     const newUser = new User({
       ...req.body,
@@ -43,9 +57,16 @@ const register = async (req, res) => {
 // login
 const login = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { error } = loginschema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
+=======
+    // Validate the request body
+    const { error } = loginSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+>>>>>>> a1b71c5 (validator added)
     }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
@@ -100,9 +121,16 @@ const logout = async (req, res) => {
 // reset
 const resetPassword = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { error } = resetPasswordSchema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
+=======
+    // Validate the request body
+    const { error } = resetPasswordSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+>>>>>>> a1b71c5 (validator added)
     }
     const { email } = req.body;
 
@@ -133,6 +161,11 @@ const resetPassword = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
+    // Validate the request body
+    const { error } = updatePasswordSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
     const { resetToken } = req.params;
 
     if (!resetToken) {
