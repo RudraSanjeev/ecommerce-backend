@@ -7,7 +7,7 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-
+    k;
     jwt.verify(token, process.env.JWT_TOKEN_SEC, (err, user) => {
       if (err) {
         return res.status(403).json("token validation failed !");
