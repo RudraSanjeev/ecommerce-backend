@@ -2,9 +2,9 @@ const Joi = require("joi");
 
 // add
 const addAddressSchema = Joi.object({
-  houseNo: Joi.string().trim().required(),
-  landmark: Joi.string().trim().required(),
-  city: Joi.string().trim().required(),
+  houseNo: Joi.string().trim().required().min(3).max(20),
+  landmark: Joi.string().trim().required().min(10).max(100),
+  city: Joi.string().trim().required().min(3).max(20),
   pincode: Joi.string().trim().length(6).required().messages({
     "string.length": "pincode must have of {#length} char",
     "string.required": "pincode is required !",
