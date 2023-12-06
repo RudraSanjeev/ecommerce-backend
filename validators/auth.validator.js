@@ -66,9 +66,17 @@ const resetPasswordSchema = Joi.object({
     .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
     .message("invalid email format !"),
 });
+const updatePasswordSchema = Joi.object({
+  password: Joi.string()
+    .trim()
+    .required()
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+    .message("invalid password format !"),
+});
 
 module.exports = {
   registerSchema,
   loginschema,
   resetPasswordSchema,
+  updatePasswordSchema,
 };

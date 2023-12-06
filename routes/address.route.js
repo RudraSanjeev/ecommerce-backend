@@ -1,7 +1,4 @@
-const {
-  verifyToken,
-  verifyAndAuthorize,
-} = require("../middlewares/jwt/verifyToken.js");
+const { verifyAndAuthorize } = require("../middlewares/jwt/verifyToken.js");
 const router = require("express").Router();
 const {
   addAddress,
@@ -12,10 +9,10 @@ const {
 } = require("../controllers/address.controller.js");
 
 // add
-router.post("/add", verifyAndAuthorize, addAddress);
+router.post("/", verifyAndAuthorize, addAddress);
 
 // delete
-router.patch("/update/:productId", verifyAndAuthorize, updateAddress);
+router.patch("/:productId", verifyAndAuthorize, updateAddress);
 
 // get  address by userid
 router.delete("/", verifyAndAuthorize, deleteAddress);
@@ -24,5 +21,5 @@ router.delete("/", verifyAndAuthorize, deleteAddress);
 router.get("/", verifyAndAuthorize, getAddress);
 
 // getAddress all
-router.get("/", verifyAndAuthorize, getAllAddressOfUser);
+router.get("/all", verifyAndAuthorize, getAllAddressOfUser);
 module.exports = router;

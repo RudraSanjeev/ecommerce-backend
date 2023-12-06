@@ -1,4 +1,5 @@
 const User = require("../models/user.model.js");
+// const Joi = require("joi");
 const dotenv = require("dotenv");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
@@ -10,32 +11,20 @@ const {
   generateRefreshAcessToken,
 } = require("../middlewares/jwt/generateToken.js");
 const {
-<<<<<<< HEAD
   registerSchema,
   loginschema,
   resetPasswordSchema,
-=======
-  registrationSchema,
-  loginSchema,
-  resetPasswordSchema,
   updatePasswordSchema,
->>>>>>> a1b71c5 (validator added)
 } = require("../validators/auth.validator.js");
 dotenv.config();
 
 // register
 const register = async (req, res) => {
   try {
-<<<<<<< HEAD
+    // Validate the request body
     const { error } = registerSchema.validate(req.body);
     if (error) {
-      return res.status(400).json(error.message || "Bad request !");
-=======
-    // Validate the request body
-    const { error } = registrationSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
->>>>>>> a1b71c5 (validator added)
+      return res.status(400).json(err.message || "Internal server error !");
     }
     const newUser = new User({
       ...req.body,
@@ -48,7 +37,9 @@ const register = async (req, res) => {
         Hi, ${savedUser.firstName}, \n You have been registered successfully !
       `;
     sendNotification(process.env.GMAIL_USER, savedUser.email, subject, test);
-    res.status(201).json(savedUser);
+    res
+      .status(201)
+      .json(`${savedUser.firstName}, You have registered Successfully !`);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -57,16 +48,10 @@ const register = async (req, res) => {
 // login
 const login = async (req, res) => {
   try {
-<<<<<<< HEAD
+    // Validate the request body
     const { error } = loginschema.validate(req.body);
     if (error) {
-      return res.status(400).json(error.message || "Bad request !");
-=======
-    // Validate the request body
-    const { error } = loginSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
->>>>>>> a1b71c5 (validator added)
+      return res.status(400).json(err.message || "Internal server error !");
     }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
@@ -121,16 +106,9 @@ const logout = async (req, res) => {
 // reset
 const resetPassword = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { error } = resetPasswordSchema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
-=======
-    // Validate the request body
-    const { error } = resetPasswordSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
->>>>>>> a1b71c5 (validator added)
     }
     const { email } = req.body;
 
@@ -145,7 +123,7 @@ const resetPassword = async (req, res) => {
 
     const resetLink = `http://localhost:8000/api/auth/update-password/${resetToken}`;
 
-    // mailgun
+    // mail
     const text = `Click here to reset your password ${resetLink}`;
     sendNotification(
       process.env.GMAIL_USER,
@@ -158,7 +136,7 @@ const resetPassword = async (req, res) => {
     res.status(500).json(err.message || "Internal sever error !");
   }
 };
-
+// update
 const updatePassword = async (req, res) => {
   try {
     // Validate the request body

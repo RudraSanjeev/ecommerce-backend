@@ -9,16 +9,16 @@ const {
   searchAllMatchingProduct,
 } = require("../controllers/product.controller.js");
 // add
-router.post("/add", verifyAndAdmin, addProduct);
+router.post("/", verifyAndAdmin, addProduct);
 
 // update
-router.patch("/update/:productId", verifyAndAdmin, updateProduct);
+router.patch("/:productId", verifyAndAdmin, updateProduct);
 
 // delete
-router.delete("/delete/:id", verifyAndAdmin, deleteProduct);
+router.delete("/:productId", verifyAndAdmin, deleteProduct);
 
 // get a product
-router.get("/findAll", getAllProduct);
+router.get("/all", getAllProduct);
 
 // searching all matching product
 router.get("/search", searchAllMatchingProduct);

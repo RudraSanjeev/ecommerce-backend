@@ -18,7 +18,7 @@ const updateAddressSchema = Joi.object({
   houseNo: Joi.string().trim(),
   landmark: Joi.string().trim(),
   city: Joi.string().trim(),
-  pincode: Joi.string().trim().length(10),
+  pincode: Joi.string().trim().length(6),
   state: Joi.string().trim(),
   country: Joi.string().trim(),
 });

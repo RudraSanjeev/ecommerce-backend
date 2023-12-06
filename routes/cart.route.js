@@ -12,13 +12,13 @@ const {
   getAllCart,
 } = require("../controllers/cart.controller.js");
 // add
-router.post("/add", verifyToken, addCart);
+router.post("/", verifyToken, addCart);
 
 // update
-router.patch("/update/:productId", verifyAndAuthorize, updatedCart);
+router.patch("/:productId", verifyAndAuthorize, updatedCart);
 
 // delete
-router.delete("/delete/:cartId", verifyAndAuthorize, deletedCart);
+router.delete("/:cartId", verifyAndAuthorize, deletedCart);
 
 // get single user cart
 router.get("/", verifyAndAuthorize, getCart);

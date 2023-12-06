@@ -1,7 +1,4 @@
-const {
-  verifyToken,
-  verifyAndAuthorize,
-} = require("../middlewares/jwt/verifyToken.js");
+const { verifyAndAuthorize } = require("../middlewares/jwt/verifyToken.js");
 const router = require("express").Router();
 const {
   addWishList,
@@ -9,10 +6,10 @@ const {
   getWishList,
 } = require("../controllers/wishlist.controller.js");
 // add
-router.post("/add", verifyAndAuthorize, addWishList);
+router.post("/", verifyAndAuthorize, addWishList);
 
 // delete
-router.patch("/update/:productId", verifyAndAuthorize, updateWishlist);
+router.patch("/:productId", verifyAndAuthorize, updateWishlist);
 
 // get  order by userid
 router.get("/", verifyAndAuthorize, getWishList);

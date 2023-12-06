@@ -33,6 +33,8 @@ app.use("/api/order", orderRoute);
 app.use("/api/address", addressRoute);
 
 // server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Backend is running at port: ${PORT} `);
 });
+
+module.exports = server;

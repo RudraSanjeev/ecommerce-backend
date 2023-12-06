@@ -4,6 +4,8 @@ const {
   addAddressSchema,
   updateAddressSchema,
 } = require("../validators/address.validator.js");
+
+// add
 const addAddress = async (req, res) => {
   try {
     const { error } = addAddressSchema.validate(req.body);
@@ -21,6 +23,7 @@ const addAddress = async (req, res) => {
       return res.status(400).json("Allready this address is saved ! ");
     }
     await newAddress.save();
+
     res.status(201).json(newAddress);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
@@ -45,8 +48,12 @@ const updateAddress = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
+    const { houseNo, landmark, city, pincode, state, country } =
+      updatedAddress._doc;
 
-    res.status(201).json(updatedAddress);
+    res
+      .status(201)
+      .json({ _id, houseNo, landmark, city, pincode, state, country });
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }

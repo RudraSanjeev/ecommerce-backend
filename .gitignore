@@ -1,3 +1,6 @@
 node_modules
 package-lock.json
 .env
+
+# Jest coverage directory
+/coverage

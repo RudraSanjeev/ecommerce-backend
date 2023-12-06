@@ -1,5 +1,4 @@
 const {
-  verifyToken,
   verifyAndAuthorize,
   verifyAndAdmin,
 } = require("../middlewares/jwt/verifyToken.js");
@@ -13,21 +12,21 @@ const {
   getAllOrder,
 } = require("../controllers/order.controller.js");
 // add
-router.post("/add", verifyAndAuthorize, addOrder);
+router.post("/", verifyAndAuthorize, addOrder);
 
 // update
-router.patch("/update/:orderId", verifyAndAdmin, updateOrder);
+router.patch("/:orderId", verifyAndAdmin, updateOrder);
 
 // delete
-router.delete("/delete/:cartId", verifyAndAdmin, deleteOrder);
+router.delete("/:cartId", verifyAndAdmin, deleteOrder);
 
 // get  order by userid
 router.get("/:orderId", verifyAndAuthorize, getUserOrderByOrderId);
 
 // get all cart
-router.get("/user/:userId", verifyAndAuthorize, getUserOrderByUserId);
+router.get("/:userId", verifyAndAuthorize, getUserOrderByUserId);
 
 // get a user cart
-router.get("/all/", verifyAndAdmin, getAllOrder);
+router.get("/all", verifyAndAdmin, getAllOrder);
 
 module.exports = router;
