@@ -20,15 +20,12 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "mailgun.js": "^9.3.0",
-    "mongoose": "^8.0.1",
+    "mongoose": "^8.0.2",
     "nodemailer": "^6.9.7",
     "stripe": "^14.7.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^6.3.3"
-  },
-  "jest": {
-    "automock": true
   }
 }

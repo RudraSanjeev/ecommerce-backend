@@ -1,11 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const generateToken = (user) => {
-  if (!user) {
-    return new Error("Missing user object");
-  }
-  if (!user._id) {
-    return new Error("Missing user._id");
+  const { _id, role } = user;
+  if (!_id || !role) {
+    // return "_id or role is empty !";
+    return new Error("_id or role is empty !");
   }
   const token = jwt.sign(
     { _id: user._id, role: user.role },

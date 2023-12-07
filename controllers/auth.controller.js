@@ -64,6 +64,7 @@ const login = async (req, res) => {
     if (originalPassword !== req.body.password) {
       return res.status(401).json("password is incorrect !");
     }
+    console.log(user);
     const token = generateToken(user);
     const refreshtoken = generateRefreshToken(user);
     user.refreshToken = refreshtoken;
