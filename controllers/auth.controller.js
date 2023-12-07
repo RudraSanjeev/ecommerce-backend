@@ -24,7 +24,7 @@ const register = async (req, res) => {
     // Validate the request body
     const { error } = registerSchema.validate(req.body);
     if (error) {
-      return res.status(400).json(err.message || "Internal server error !");
+      return res.status(400).json(error.message || "Internal server error !");
     }
     const newUser = new User({
       ...req.body,
@@ -51,7 +51,7 @@ const login = async (req, res) => {
     // Validate the request body
     const { error } = loginschema.validate(req.body);
     if (error) {
-      return res.status(400).json(err.message || "Internal server error !");
+      return res.status(400).json(error.message || "Internal server error !");
     }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
