@@ -62,13 +62,11 @@ const addProductSchema = Joi.object({
 // update
 const updateProductSchema = Joi.object({
   title: Joi.string().trim().min(3).max(20).messages({
-    "string.required": "title is required !",
     "string.min": "title should be at least 3 char !",
     "string.max": "title should be at most 20 char !",
   }),
 
   desc: Joi.string().trim().min(5).max(100).messages({
-    "string.required": "desc is required !",
     "string.min": "desc should be at least {#limit} char !",
     "string.max": "desc should be at most {#limit} char !",
   }),
@@ -78,24 +76,14 @@ const updateProductSchema = Joi.object({
     "array.max": "img should be at most {#limit} !",
   }),
 
-  currency: Joi.string()
-    .trim()
-    .valid("INR", "USD", "EUR")
-    .default("INR")
-    .required()
-    .messages({
-      "string.required": "currency is required !",
-      "string.valid": "currency must be among INR, USD or EUR !",
-    }),
+  currency: Joi.string().trim().valid("INR", "USD", "EUR").default("INR"),
 
   price: Joi.number().min(1).max(10000000).messages({
-    "number.required": "price is required !",
     "number.min": "price should be at least {#limit}  !",
     "number.max": "price should be at most {#limit} !",
   }),
 
   quantity: Joi.number().min(1).max(1000).messages({
-    "number.required": "quantity is required !",
     "number.min": "price should be at least {#limit}  !",
     "number.max": "price should be at most {#limit} !",
   }),
@@ -118,6 +106,7 @@ const updateProductSchema = Joi.object({
   inStock: Joi.boolean().default(true),
 });
 
+// delete
 const deleteProductSchema = Joi.object({
   productId: Joi.string().trim().length(24).hex().required().messages({
     "string.length": "Product ID should be exactly 24 characters long!",

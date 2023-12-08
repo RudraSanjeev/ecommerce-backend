@@ -70,7 +70,7 @@ const addCart = async (req, res) => {
     await product.save();
     res.status(201).json(cart);
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     res.status(500).json(error.message || "Internal Server Error");
   }
 };

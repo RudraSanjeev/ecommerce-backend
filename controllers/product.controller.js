@@ -49,7 +49,9 @@ const updateProduct = async (req, res) => {
 // delete - product
 const deleteProduct = async (req, res) => {
   try {
-    const { error } = deleteProductSchema.validate(req.params.productId);
+    const { error } = deleteProductSchema.validate({
+      productId: req.params.productId,
+    });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
@@ -63,13 +65,17 @@ const deleteProduct = async (req, res) => {
 // find a product
 const getProduct = async (req, res) => {
   try {
-    const { error } = getProductSchema.validate(req.params.productId);
+    const { error } = getProductSchema.validate({
+      productId: req.params.productId,
+    });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
     const product = await Product.findById(req.params.productId);
-
-    res.status(201).json(product);
+    if (!product) {
+      return res.status(404).json("Product not found !");
+    }
+    res.status(200).json(product);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -79,6 +85,9 @@ const getProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
   try {
     const products = await Product.find();
+    if (products.length === 0) {
+      return res.status(404).json("products not found !");
+    }
 
     res.status(200).json(products);
   } catch (err) {
@@ -88,7 +97,9 @@ const getAllProduct = async (req, res) => {
 
 // search - all product
 const searchAllMatchingProduct = async (req, res) => {
-  const { error } = searchAllMatchingProductSchema.validate(req.query.keyword);
+  const { error } = searchAllMatchingProductSchema.validate({
+    keyword: req.query.keyword,
+  });
   if (error) {
     return res.status(400).json(error.message || "Bad request !");
   }
