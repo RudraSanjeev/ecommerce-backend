@@ -33,16 +33,13 @@ const generateRefreshToken = (user) => {
   return token;
 };
 
-const generateRefreshAcessToken = async (refreshToken) => {
+const generateRefreshAcessToken = (refreshToken) => {
   try {
-    const user = await jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_TOKEN_SEC
-    );
+    const user = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SEC);
     const newAccessToken = generateToken(user);
     return newAccessToken;
   } catch (err) {
-    throw new Error("Token validation failed!");
+    throw err;
   }
 };
 
