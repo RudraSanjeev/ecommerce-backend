@@ -9,6 +9,7 @@ const {
   updatedOrderSchema,
   deletedOrderSchema,
 } = require("../validators/order.validation.js");
+const Product = require("../models/product.model.js");
 //CREATE
 const addOrder = async (req, res) => {
   try {
@@ -20,8 +21,9 @@ const addOrder = async (req, res) => {
     const user = await User.findById(userId);
     // console.log(user);
 
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-
+    const cart = await Cart.findOne({ userId })
+      .populate("items.productId")
+      .exec();
     if (!cart) {
       return res.status(404).json("No item in the cart!");
     }
@@ -52,6 +54,13 @@ const addOrder = async (req, res) => {
     });
 
     await newOrder.save();
+
+    // update product collections
+    cart.items.forEach(async (item) => {
+      const product = await Product.findById(item.productId);
+      product.quantity -= item.quantity;
+      await product.save();
+    });
     await Cart.findByIdAndDelete(cart._id);
 
     sendNotification(

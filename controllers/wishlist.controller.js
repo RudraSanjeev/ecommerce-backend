@@ -1,9 +1,6 @@
 const Wishlist = require("../models/wishlist.model.js");
 const Product = require("../models/product.model.js");
-const {
-  addWishListSchema,
-  updateWishlistSchema,
-} = require("../validators/wishlist.validator.js");
+const { addWishListSchema } = require("../validators/wishlist.validator.js");
 //CREATE
 const addWishList = async (req, res) => {
   // const newWishList = new Wishlist(req.body);
@@ -52,34 +49,36 @@ const addWishList = async (req, res) => {
 };
 
 //update
-const updateWishlist = async (req, res) => {
-  try {
-    const { error } = updateWishlistSchema.validate(req.params.productId);
-    if (error) {
-      return res.status(400).json(error.message || "Bad request !");
-    }
-    const productId = req.params.productId;
-    const userId = req.user._id;
-    const wishlist = await Wishlist.findOne({ userId });
+// const updateWishlist = async (req, res) => {
+//   try {
+//     const { error } = updateWishlistSchema.validate({
+//       productId: req.params.productId,
+//     });
+//     if (error) {
+//       return res.status(400).json(error.message || "Bad request !");
+//     }
+//     const productId = req.params.productId;
+//     const userId = req.user._id;
+//     const wishlist = await Wishlist.findOne({ userId });
 
-    if (!wishlist) {
-      return res.status(404).json("Wishlist not found !");
-    }
+//     if (!wishlist) {
+//       return res.status(404).json("Wishlist not found !");
+//     }
 
-    const existingItem = wishlist.items.find((item) =>
-      item.productId.equals(productId)
-    );
+//     const existingItem = wishlist.items.find((item) =>
+//       item.productId.equals(productId)
+//     );
 
-    if (!existingItem) {
-      return res.status(404).json("No product found in the wishlist !");
-    }
-    wishlist.items.pull({ productId: existingItem.productId });
-    await wishlist.save();
-    res.status(200).json("Item  has been deleted from wishlist ...");
-  } catch (err) {
-    res.status(500).json(err.message || "Internal server error !");
-  }
-};
+//     if (!existingItem) {
+//       return res.status(404).json("No product found in the wishlist !");
+//     }
+//     wishlist.items.pull({ productId: existingItem.productId });
+//     await wishlist.save();
+//     res.status(200).json("Item  has been deleted from wishlist ...");
+//   } catch (err) {
+//     res.status(500).json(err.message || "Internal server error !");
+//   }
+// };
 
 //GET USER wishlist
 const getWishList = async (req, res) => {
@@ -87,7 +86,7 @@ const getWishList = async (req, res) => {
     const userId = req.user._id;
     const wishlist = await Wishlist.findOne({ userId });
     if (!wishlist) {
-      return res.status(404).json("wihslist not found !");
+      return res.status(404).json("wishlist not found !");
     }
     res.status(200).json(wishlist);
   } catch (err) {
@@ -97,6 +96,6 @@ const getWishList = async (req, res) => {
 
 module.exports = {
   addWishList,
-  updateWishlist,
+  // updateWishlist,
   getWishList,
 };

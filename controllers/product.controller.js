@@ -82,16 +82,40 @@ const getProduct = async (req, res) => {
 };
 
 // find all product
+
 const getAllProduct = async (req, res) => {
   try {
-    const products = await Product.find();
+    const { page = 1, limit = 2, title = null, desc = null } = req.query;
+
+    const options = {
+      limit: parseInt(limit),
+      skip: (page - 1) * limit,
+    };
+
+    const filter = {};
+
+    if (title == 1) {
+      filter.title = 1;
+    }
+    if (desc == 1) {
+      filter.desc = 1;
+    }
+
+    let products;
+
+    if (Object.keys(filter).length === 0) {
+      products = await Product.find({}, null, options);
+    } else {
+      products = await Product.find({}, filter, options);
+    }
+
     if (products.length === 0) {
-      return res.status(404).json("products not found !");
+      return res.status(404).json("Products not found!");
     }
 
     res.status(200).json(products);
   } catch (err) {
-    res.status(500).json(err.message || "Internal server error !");
+    res.status(500).json(err.message || "Internal server error!");
   }
 };
 

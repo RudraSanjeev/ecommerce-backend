@@ -8,8 +8,7 @@ const addOrderSchema = Joi.object({
   orderStatus: Joi.string()
     .trim()
     .valid("pending", "successfull", "delivered", "cancelled")
-    .default("pending")
-    .required(),
+    .default("pending"),
 });
 
 const updatedOrderSchema = Joi.object({

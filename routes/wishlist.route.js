@@ -9,7 +9,7 @@ const {
 router.post("/", verifyAndAuthorize, addWishList);
 
 // delete
-router.patch("/:productId", verifyAndAuthorize, updateWishlist);
+// router.patch("/:productId", verifyAndAuthorize, updateWishlist);
 
 // get  order by userid
 router.get("/", verifyAndAuthorize, getWishList);

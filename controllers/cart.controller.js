@@ -4,24 +4,19 @@ const Product = require("../models/product.model.js");
 const {
   addCartSchema,
   updatedCartSchema,
-  deletedCartSchema,
+  // deletedCartSchema,
 } = require("../validators/cart.validator.js");
 // add
 const addCart = async (req, res) => {
   try {
+    const userId = req.user._id;
+    if (!req.body.items.quantity) {
+      req.body.items.quantity = 1;
+    }
+    const { productId, quantity } = req.body.items;
     const { error } = addCartSchema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
-    }
-    const userId = req.user._id;
-
-    const productId = req.body.items.productId;
-    const quantity = req.body.items.quantity;
-
-    if (!productId || !quantity) {
-      return res.status(400).json({
-        error: `User ID, Product ID, and Quantity are required.${userId}, ${productId}, ${quantity} `,
-      });
     }
 
     const product = await Product.findById(productId);
@@ -55,9 +50,6 @@ const addCart = async (req, res) => {
       cart.totalPrice += product.price * quantity;
       await cart.save();
 
-      // updating product collection.
-      product.quantity -= quantity;
-      await product.save();
       return res.status(201).json(cart);
     }
 
@@ -65,12 +57,8 @@ const addCart = async (req, res) => {
     cart.totalPrice += product.price * quantity;
     await cart.save();
 
-    // updating product collection.
-    product.quantity -= quantity;
-    await product.save();
     res.status(201).json(cart);
   } catch (error) {
-    // console.error(error);
     res.status(500).json(error.message || "Internal Server Error");
   }
 };
@@ -78,20 +66,25 @@ const addCart = async (req, res) => {
 // update
 const updatedCart = async (req, res) => {
   try {
-    const { error } = updatedCartSchema.validate(req.params.productId);
+    // const cartId = req.params.cartId;
+    const productId = req.params.productId;
+    const quantity = req.body.items.quantity;
+    const userId = req.user._id;
+    if (!quantity) {
+      return res.status(400).json("Quantity is missing !");
+    }
+
+    const { error } = updatedCartSchema.validate({
+      productId: req.params.productId,
+      quantity,
+    });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
-
-    // const cartId = req.params.cartId;
-    const productId = req.params.productId;
-    const quantity = req.body.quantity;
-    const userId = req.user._id;
-
     const cart = await Cart.findOne({ userId });
 
     if (!cart) {
-      return res.status(404).json("No cart found with the given cart id");
+      return res.status(404).json("No cart found with the given user id");
     }
 
     const existingItem = cart.items.find((item) =>
@@ -105,54 +98,45 @@ const updatedCart = async (req, res) => {
     }
 
     const product = await Product.findById(productId);
-    if (quantity > existingItem.quantity) {
+    if (quantity > product.quantity) {
       return res
         .status(400)
         .json("given quantity is greator than cart quantity !");
     }
-    existingItem.quantity -= quantity;
-    cart.totalPrice -= product.price * quantity;
-
+    existingItem.quantity = quantity;
+    cart.totalPrice = product.price * quantity;
     await cart.save();
-
-    // updating product collection.
-    product.quantity += quantity;
-    await product.save();
-    if (cart.totalPrice === 0) {
-      await Cart.findByIdAndDelete(cart._id);
-    }
-
     res.status(200).json(cart);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json(err.message || "Internal server error");
   }
 };
 
-// delete cart
-const deletedCart = async (req, res) => {
-  try {
-    const { error } = deletedCartSchema.validate(req.params.cartId);
-    if (error) {
-      return res.status(400).json(error.message || "Bad request !");
-    }
-    const cartId = req.params.cartId;
-    const userId = req.user._id;
-    const cart = await Cart.findOne({ userId });
-    cart.items.forEach(async (item) => {
-      const productId = item.productId;
-      const quantity = item.quantity;
-      const product = await Product.findById(productId);
-      product.quantity += quantity;
-      await product.save();
-    });
-    await Cart.findByIdAndDelete(cartId);
+// delete cart -- not required
+// const deletedCart = async (req, res) => {
+//   try {
+//     const { error } = deletedCartSchema.validate({cartId: req.params.cartId});
+//     if (error) {
+//       return res.status(400).json(error.message || "Bad request !");
+//     }
+//     const cartId = req.params.cartId;
+//     const userId = req.user._id;
+//     const cart = await Cart.findOne({ userId });
+//     cart.items.forEach(async (item) => {
+//       const productId = item.productId;
+//       const quantity = item.quantity;
+//       const product = await Product.findById(productId);
+//       product.quantity += quantity;
+//       await product.save();
+//     });
+//     await Cart.findByIdAndDelete(cartId);
 
-    res.status(200).json("cart has been deleted successfully !");
-  } catch (err) {
-    res.status(500).json(err.message || "Internal server error !");
-  }
-};
+//     res.status(200).json("cart has been deleted successfully !");
+//   } catch (err) {
+//     res.status(500).json(err.message || "Internal server error !");
+//   }
+// };
 
 // get a single cart
 const getCart = async (req, res) => {
@@ -186,7 +170,7 @@ const getAllCart = async (req, res) => {
 module.exports = {
   addCart,
   updatedCart,
-  deletedCart,
+  // deletedCart,
   getCart,
   getAllCart,
 };

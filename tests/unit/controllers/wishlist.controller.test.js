@@ -1,9 +1,95 @@
-const { addWishList } = require("../../../controllers/wishlist.controller.js");
+const {
+  addWishList,
+  getWishList,
+} = require("../../../controllers/wishlist.controller.js");
 const Wishlist = require("../../../models/wishlist.model.js");
 const Product = require("../../../models/product.model.js");
 
 jest.mock("../../../models/wishlist.model.js");
 jest.mock("../../../models/product.model.js");
+
+// add
+
+// get user wishlist
+describe("getWishList function", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return the wishlist successfully when it exists", async () => {
+    const req = {
+      user: {
+        _id: "657306307060b5c8f0ee1bf2",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const existingWishlistMock = {
+      userId: "657306307060b5c8f0ee1bf2",
+      items: [
+        {
+          productId: "657306307060b5c8f0ee1bf4",
+        },
+      ],
+    };
+
+    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
+
+    await getWishList(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(existingWishlistMock);
+  });
+
+  it("should handle getWishList error when wishlist is not found", async () => {
+    const req = {
+      user: {
+        _id: "657306307060b5c8f0ee1bf2",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    Wishlist.findOne.mockResolvedValueOnce(null);
+
+    await getWishList(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith("wishlist not found !");
+  });
+
+  it("should handle getWishList error with internal server error", async () => {
+    const req = {
+      user: {
+        _id: "657306307060b5c8f0ee1bf2",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const internalServerError = new Error("Internal server error!");
+    internalServerError.message = "Internal server error!";
+
+    Wishlist.findOne.mockRejectedValueOnce(internalServerError);
+
+    await getWishList(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(
+      internalServerError.message || "Internal server error !"
+    );
+  });
+});
 
 describe("addWishList function", () => {
   afterEach(() => {
@@ -81,7 +167,7 @@ describe("addWishList function", () => {
     await addWishList(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    // expect(res.json).toHaveBeenCalledWith(validationError.message);
+    expect(res.json).toHaveBeenCalledWith('"items.productId" is required');
   });
 
   it("should handle addWishList error when product ID is missing", async () => {
@@ -220,182 +306,5 @@ describe("addWishList function", () => {
     expect(res.json).toHaveBeenCalledWith(
       "item.productId.equals is not a function"
     );
-  });
-});
-
-// update
-const {
-  updateWishlist,
-} = require("../../../controllers/wishlist.controller.js");
-const Wishlist = require("../../../models/wishlist.model.js");
-
-jest.mock("../../../models/wishlist.model.js");
-
-describe("updateWishlist function", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("should update a wishlist successfully", async () => {
-    const req = {
-      user: {
-        _id: "userId",
-      },
-      params: {
-        productId: "productId",
-      },
-    };
-
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const updateWishlistSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: null }),
-    };
-
-    const existingItemMock = {
-      productId: "productId",
-    };
-
-    const existingWishlistMock = {
-      userId: "userId",
-      items: [existingItemMock],
-      save: jest.fn(),
-    };
-
-    updateWishlistSchemaMock.validate.mockReturnValue({ error: null });
-    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
-
-    await updateWishlist(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(
-      "Item has been deleted from wishlist ..."
-    );
-    expect(existingWishlistMock.save).toHaveBeenCalled();
-  });
-
-  it("should handle updateWishlist error when validation fails", async () => {
-    const req = {
-      params: {
-        productId: "invalidProductId",
-      },
-    };
-
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const validationError = new Error("Validation error");
-    validationError.message = "Validation error details";
-
-    const updateWishlistSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: validationError }),
-    };
-
-    await updateWishlist(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    // expect(res.json).toHaveBeenCalledWith(validationError.message);
-  });
-
-  it("should handle updateWishlist error when wishlist is not found", async () => {
-    const req = {
-      user: {
-        _id: "userId",
-      },
-      params: {
-        productId: "productId",
-      },
-    };
-
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const updateWishlistSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: null }),
-    };
-
-    Wishlist.findOne.mockResolvedValueOnce(null);
-
-    await updateWishlist(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(404);
-    // expect(res.json).toHaveBeenCalledWith("Wishlist not found !");
-  });
-
-  it("should handle updateWishlist error when item is not found in the wishlist", async () => {
-    const req = {
-      user: {
-        _id: "userId",
-      },
-      params: {
-        productId: "productId",
-      },
-    };
-
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const updateWishlistSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: null }),
-    };
-
-    const existingWishlistMock = {
-      userId: "userId",
-      items: [],
-    };
-
-    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
-
-    await updateWishlist(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(404);
-    // expect(res.json).toHaveBeenCalledWith("No product found in the wishlist !");
-  });
-
-  it("should handle updateWishlist error with internal server error", async () => {
-    const req = {
-      user: {
-        _id: "userId",
-      },
-      params: {
-        productId: "productId",
-      },
-    };
-
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const updateWishlistSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: null }),
-    };
-
-    const existingItemMock = {
-      productId: "productId",
-    };
-
-    const existingWishlistMock = {
-      userId: "userId",
-      items: [existingItemMock],
-      save: jest.fn().mockRejectedValue(new Error("Internal server error!")),
-    };
-
-    updateWishlistSchemaMock.validate.mockReturnValue({ error: null });
-    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
-
-    await updateWishlist(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith("Internal server error !");
   });
 });

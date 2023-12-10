@@ -6,8 +6,11 @@ const addWishListSchema = Joi.object({
   }).required(),
 });
 
-const updateWishlistSchema = Joi.object({
-  productId: Joi.string().trim().length(24).hex().required(),
-});
+// const updateWishlistSchema = Joi.object({
+//   productId: Joi.string().trim().length(24).hex().required(),
+// });
 
-module.exports = { addWishListSchema, updateWishlistSchema };
+module.exports = {
+  addWishListSchema,
+  //  updateWishlistSchema
+};

@@ -9,6 +9,12 @@ const orderRoute = require("./routes/order.route.js");
 const addressRoute = require("./routes/address.route.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+// swagger
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+const options = require("./swaggerDocs/swaggerOptions.js");
+const specs = swaggerJsDoc(options);
+
 const app = express();
 dotenv.config();
 // utils
@@ -22,6 +28,7 @@ mongoose
   .catch((err) => console.error("db connection failed: " + err));
 
 // middleware
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());

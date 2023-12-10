@@ -23,7 +23,9 @@
     "mailgun.js": "^9.3.0",
     "mongoose": "^8.0.2",
     "nodemailer": "^6.9.7",
-    "stripe": "^14.7.0"
+    "stripe": "^14.7.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
