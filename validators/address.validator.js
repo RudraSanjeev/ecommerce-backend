@@ -15,6 +15,7 @@ const addAddressSchema = Joi.object({
 
 // update
 const updateAddressSchema = Joi.object({
+  addressId: Joi.string().trim().length(24).hex().required(),
   houseNo: Joi.string().trim(),
   landmark: Joi.string().trim(),
   city: Joi.string().trim(),

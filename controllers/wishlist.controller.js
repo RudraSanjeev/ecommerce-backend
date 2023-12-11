@@ -1,6 +1,9 @@
 const Wishlist = require("../models/wishlist.model.js");
 const Product = require("../models/product.model.js");
-const { addWishListSchema } = require("../validators/wishlist.validator.js");
+const {
+  addWishListSchema,
+  updateWishlistSchema,
+} = require("../validators/wishlist.validator.js");
 //CREATE
 const addWishList = async (req, res) => {
   // const newWishList = new Wishlist(req.body);
@@ -48,37 +51,38 @@ const addWishList = async (req, res) => {
   }
 };
 
-//update
-// const updateWishlist = async (req, res) => {
-//   try {
-//     const { error } = updateWishlistSchema.validate({
-//       productId: req.params.productId,
-//     });
-//     if (error) {
-//       return res.status(400).json(error.message || "Bad request !");
-//     }
-//     const productId = req.params.productId;
-//     const userId = req.user._id;
-//     const wishlist = await Wishlist.findOne({ userId });
+// update;
+const updateWishlist = async (req, res) => {
+  try {
+    const productId = req.params.productId;
 
-//     if (!wishlist) {
-//       return res.status(404).json("Wishlist not found !");
-//     }
+    const { error } = updateWishlistSchema.validate({
+      productId,
+    });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    const userId = req.user._id;
+    const wishlist = await Wishlist.findOne({ userId });
 
-//     const existingItem = wishlist.items.find((item) =>
-//       item.productId.equals(productId)
-//     );
+    if (!wishlist) {
+      return res.status(404).json("Wishlist not found !");
+    }
 
-//     if (!existingItem) {
-//       return res.status(404).json("No product found in the wishlist !");
-//     }
-//     wishlist.items.pull({ productId: existingItem.productId });
-//     await wishlist.save();
-//     res.status(200).json("Item  has been deleted from wishlist ...");
-//   } catch (err) {
-//     res.status(500).json(err.message || "Internal server error !");
-//   }
-// };
+    const existingItem = wishlist.items.find((item) =>
+      item.productId.equals(productId)
+    );
+
+    if (!existingItem) {
+      return res.status(404).json("No product found in the wishlist !");
+    }
+    wishlist.items.pull({ productId: existingItem.productId });
+    await wishlist.save();
+    res.status(200).json("Item  has been deleted from wishlist ...");
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error !");
+  }
+};
 
 //GET USER wishlist
 const getWishList = async (req, res) => {
@@ -96,6 +100,6 @@ const getWishList = async (req, res) => {
 
 module.exports = {
   addWishList,
-  // updateWishlist,
+  updateWishlist,
   getWishList,
 };

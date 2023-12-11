@@ -7,8 +7,7 @@ const {
   addOrder,
   updateOrder,
   deleteOrder,
-  getUserOrderByOrderId,
-  getUserOrderByUserId,
+  getOrder,
   getAllOrder,
 } = require("../controllers/order.controller.js");
 // add
@@ -18,15 +17,12 @@ router.post("/", verifyAndAuthorize, addOrder);
 router.patch("/:orderId", verifyAndAdmin, updateOrder);
 
 // delete
-router.delete("/:cartId", verifyAndAdmin, deleteOrder);
-
-// get  order by userid
-router.get("/:orderId", verifyAndAuthorize, getUserOrderByOrderId);
-
-// get all cart
-router.get("/:userId", verifyAndAuthorize, getUserOrderByUserId);
+router.delete("/:orderId", verifyAndAdmin, deleteOrder);
 
 // get a user cart
 router.get("/all", verifyAndAdmin, getAllOrder);
+
+// get  order by userid
+router.get("/:orderId", verifyAndAuthorize, getOrder);
 
 module.exports = router;

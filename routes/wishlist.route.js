@@ -8,8 +8,8 @@ const {
 // add
 router.post("/", verifyAndAuthorize, addWishList);
 
-// delete
-// router.patch("/:productId", verifyAndAuthorize, updateWishlist);
+// update
+router.patch("/:productId", verifyAndAuthorize, updateWishlist);
 
 // get  order by userid
 router.get("/", verifyAndAuthorize, getWishList);

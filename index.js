@@ -38,7 +38,9 @@ app.use("/api/cart", cartRoute);
 app.use("/api/wishlist", wishlistRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/address", addressRoute);
-
+app.use((req, res) => {
+  res.status(404).json("page not found !");
+});
 // server
 const server = app.listen(PORT, () => {
   console.log(`Backend is running at port: ${PORT} `);

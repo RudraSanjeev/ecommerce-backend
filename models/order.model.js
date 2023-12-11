@@ -17,6 +17,19 @@ const orderSchema = new mongoose.Schema(
       required: [true, "order must have total value !"],
       default: 0,
     },
+    items: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: [true, "item must have id !"],
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
     paymentMode: {
       type: String,
       enum: ["Credit Card", "Debit Card", "Cash on delivery"],

@@ -61,6 +61,8 @@ const addProductSchema = Joi.object({
 
 // update
 const updateProductSchema = Joi.object({
+  productId: Joi.string().trim().length(24).hex().required(),
+
   title: Joi.string().trim().min(3).max(20).messages({
     "string.min": "title should be at least 3 char !",
     "string.max": "title should be at most 20 char !",

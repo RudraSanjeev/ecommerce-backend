@@ -8,7 +8,7 @@ const {
   addCart,
   updatedCart,
   deletedCart,
-  getCart,
+  // getCart,
   getAllCart,
 } = require("../controllers/cart.controller.js");
 // add
@@ -18,12 +18,12 @@ router.post("/", verifyToken, addCart);
 router.patch("/:productId", verifyAndAuthorize, updatedCart);
 
 // delete
-// router.delete("/:cartId", verifyAndAuthorize, deletedCart);
+router.delete("/:productId", verifyAndAuthorize, deletedCart);
 
 // get single user cart
-router.get("/", verifyAndAuthorize, getCart);
+// router.get("/", verifyAndAuthorize, getCart);
 
-// // get all cart
+// get all cart
 router.get("/all", verifyAndAdmin, getAllCart);
 
 module.exports = router;

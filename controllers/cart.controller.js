@@ -4,15 +4,13 @@ const Product = require("../models/product.model.js");
 const {
   addCartSchema,
   updatedCartSchema,
-  // deletedCartSchema,
+  deletedCartSchema,
 } = require("../validators/cart.validator.js");
 // add
 const addCart = async (req, res) => {
   try {
     const userId = req.user._id;
-    if (!req.body.items.quantity) {
-      req.body.items.quantity = 1;
-    }
+
     const { productId, quantity } = req.body.items;
     const { error } = addCartSchema.validate(req.body);
     if (error) {
@@ -35,9 +33,6 @@ const addCart = async (req, res) => {
       cart = new Cart({ ...req.body, userId, totalPrice: price });
       await cart.save();
 
-      // updating product collection.
-      product.quantity -= quantity;
-      await product.save();
       return res.status(201).json(cart);
     }
     // Check if the product is already in the cart
@@ -101,7 +96,7 @@ const updatedCart = async (req, res) => {
     if (quantity > product.quantity) {
       return res
         .status(400)
-        .json("given quantity is greator than cart quantity !");
+        .json("given quantity is greator than product quantity !");
     }
     existingItem.quantity = quantity;
     cart.totalPrice = product.price * quantity;
@@ -114,40 +109,29 @@ const updatedCart = async (req, res) => {
 };
 
 // delete cart -- not required
-// const deletedCart = async (req, res) => {
-//   try {
-//     const { error } = deletedCartSchema.validate({cartId: req.params.cartId});
-//     if (error) {
-//       return res.status(400).json(error.message || "Bad request !");
-//     }
-//     const cartId = req.params.cartId;
-//     const userId = req.user._id;
-//     const cart = await Cart.findOne({ userId });
-//     cart.items.forEach(async (item) => {
-//       const productId = item.productId;
-//       const quantity = item.quantity;
-//       const product = await Product.findById(productId);
-//       product.quantity += quantity;
-//       await product.save();
-//     });
-//     await Cart.findByIdAndDelete(cartId);
-
-//     res.status(200).json("cart has been deleted successfully !");
-//   } catch (err) {
-//     res.status(500).json(err.message || "Internal server error !");
-//   }
-// };
-
-// get a single cart
-const getCart = async (req, res) => {
+const deletedCart = async (req, res) => {
   try {
+    const { productId } = req.params;
+    const { error } = deletedCartSchema.validate({ productId });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
     const userId = req.user._id;
     const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json("cart not found !");
+    const existingItem = cart.items.find((item) =>
+      item.productId.equals(productId)
+    );
+    if (!existingItem) {
+      return res.status(404).json("No item found with given productId");
     }
+    cart.items = cart.items.filter((item) => {
+      return item.productId.toString() !== productId.toString();
+    });
+    await cart.save();
 
-    res.status(200).json(cart);
+    res
+      .status(200)
+      .json("Product has been deleted from the cart successfully !");
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -156,12 +140,13 @@ const getCart = async (req, res) => {
 // get all cart
 const getAllCart = async (req, res) => {
   try {
-    const carts = await Cart.find();
-    if (!carts) {
+    const userId = req.user._id;
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
       return res.status(404).json("Cart not found !");
     }
 
-    res.status(200).json(carts);
+    res.status(200).json(cart);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -170,7 +155,7 @@ const getAllCart = async (req, res) => {
 module.exports = {
   addCart,
   updatedCart,
-  // deletedCart,
-  getCart,
+  deletedCart,
+  // getCart,
   getAllCart,
 };

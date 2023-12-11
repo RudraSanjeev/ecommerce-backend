@@ -1,5 +1,16 @@
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: token
+ *       description: Use the "Bearer" authentication scheme. Provide the token in the format "Bearer [jwt_token]".
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Address
  *   description: Operations related to user addresses
@@ -38,9 +49,8 @@
  *         - state
  *         - country
  *       example:
- *         _id: address123
  *         houseNo: "123"
- *         landmark: "Near Park"
+ *         landmark: "Near Park of phase v"
  *         city: "City"
  *         pincode: "123456"
  *         state: "State"
@@ -73,7 +83,7 @@
  *       example:
  *         _id: address123
  *         houseNo: "123"
- *         landmark: "Near Park"
+ *         landmark: "Near Park of phase v"
  *         city: "City"
  *         pincode: "123456"
  *         state: "State"
@@ -114,14 +124,22 @@
  */
 router.post("/address", authenticateToken, addAddress);
 
+// update
 /**
  * @swagger
- * /api/address:
+ * /api/address/{addressId}:
  *   patch:
  *     summary: Update the address for the authenticated user
  *     tags: [Address]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the address
  *     requestBody:
  *       required: true
  *       content:

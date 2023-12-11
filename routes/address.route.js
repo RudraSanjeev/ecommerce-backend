@@ -12,14 +12,14 @@ const {
 router.post("/", verifyAndAuthorize, addAddress);
 
 // delete
-router.patch("/:productId", verifyAndAuthorize, updateAddress);
+router.patch("/:addressId", verifyAndAuthorize, updateAddress);
 
 // get  address by userid
-router.delete("/", verifyAndAuthorize, deleteAddress);
-
-// getAddress
-router.get("/", verifyAndAuthorize, getAddress);
+router.delete("/:addressId", verifyAndAuthorize, deleteAddress);
 
 // getAddress all
 router.get("/all", verifyAndAuthorize, getAllAddressOfUser);
+
+// getAddress
+router.get("/:addressId", verifyAndAuthorize, getAddress);
 module.exports = router;

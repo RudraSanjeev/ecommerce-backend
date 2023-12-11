@@ -31,12 +31,13 @@ const addProduct = async (req, res) => {
 // update - product
 const updateProduct = async (req, res) => {
   try {
-    const { error } = updateProductSchema.validate(req.body);
+    const { productId } = req.params;
+    const { error } = updateProductSchema.validate({ ...req.body, productId });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.productId,
+      productId,
       { $set: req.body },
       { new: true }
     );

@@ -4,6 +4,7 @@ const {
   addAddressSchema,
   updateAddressSchema,
 } = require("../validators/address.validator.js");
+const { mongoose } = require("mongoose");
 
 // add
 const addAddress = async (req, res) => {
@@ -32,19 +33,20 @@ const addAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
-    const { error } = updateAddressSchema.validate(req.body);
+    const { addressId } = req.params;
+
+    const { error } = updateAddressSchema.validate({ ...req.body, addressId });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
     const userId = req.user._id;
-    const address = await Address.findOne({ userId });
-    if (!address) {
+    const addresses = await Address.find({ userId });
+    if (!addresses) {
       return res.status(404).json("address not found !");
     }
-    const { _id } = address;
 
     const updatedAddress = await Address.findByIdAndUpdate(
-      _id,
+      { _id: addressId },
       { $set: req.body },
       { new: true }
     );
@@ -53,7 +55,7 @@ const updateAddress = async (req, res) => {
 
     res
       .status(201)
-      .json({ _id, houseNo, landmark, city, pincode, state, country });
+      .json({ addressId, houseNo, landmark, city, pincode, state, country });
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
@@ -62,13 +64,17 @@ const updateAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
   try {
     const userId = req.user._id;
-
-    const address = await Address.findOne({ userId });
-    if (!address) {
+    const { addressId } = req.params;
+    const addresses = await Address.find({ userId });
+    if (!addresses) {
       return res.status(404).json("No address found with given userId");
     }
-    const { _id } = address;
-    await Address.findByIdAndDelete(_id);
+    const { error } = updateAddressSchema.validate({ addressId });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+
+    await Address.findByIdAndDelete(addressId);
     res.status(200).json("Address deleted successfully !");
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
@@ -79,8 +85,16 @@ const deleteAddress = async (req, res) => {
 const getAddress = async (req, res) => {
   try {
     const userId = req.user._id;
-    const address = await Address.findOne({ userId });
-    res.status(200).json(address);
+    const { addressId } = req.params;
+    const { error } = updateAddressSchema.validate({ addressId });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    const addresses = await Address.find({ userId });
+    if (!addresses) {
+      return res.status(404).json("No address found with given ID !");
+    }
+    res.status(200).json(addresses);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }

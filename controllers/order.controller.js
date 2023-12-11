@@ -8,6 +8,7 @@ const {
   addOrderSchema,
   updatedOrderSchema,
   deletedOrderSchema,
+  getOrderSchema,
 } = require("../validators/order.validation.js");
 const Product = require("../models/product.model.js");
 //CREATE
@@ -43,6 +44,20 @@ const addOrder = async (req, res) => {
     if (!paymentIntent) {
       return res.status(400).json("payment not been done !");
     }
+
+    let isInsufficient = false;
+    for (let item of cart.items) {
+      const product = await Product.findOne({ _id: item.productId });
+      if (item.quantity > product.quantity) {
+        isInsufficient = true;
+        break;
+      }
+    }
+    if (isInsufficient) {
+      return res
+        .status(400)
+        .json("Insufficient product quantity to process order !");
+    }
     // Create a new order with the paymentIntent id
     const newOrder = new Order({
       ...req.body,
@@ -51,16 +66,17 @@ const addOrder = async (req, res) => {
       total: cart.totalPrice,
       paymentToken: paymentIntent.id,
       paymentStatus: "success",
+      items: cart.items,
     });
 
     await newOrder.save();
 
-    // update product collections
-    cart.items.forEach(async (item) => {
+    for (let item of cart.items) {
       const product = await Product.findById(item.productId);
       product.quantity -= item.quantity;
       await product.save();
-    });
+    }
+
     await Cart.findByIdAndDelete(cart._id);
 
     sendNotification(
@@ -71,7 +87,7 @@ const addOrder = async (req, res) => {
     );
     res
       .status(201)
-      .json({ newOrder, cart, clientSecret: paymentIntent.client_secret });
+      .json({ newOrder, clientSecret: paymentIntent.client_secret });
   } catch (err) {
     res.status(500).json(err.message || "Internal server error!");
   }
@@ -79,12 +95,13 @@ const addOrder = async (req, res) => {
 
 const updateOrder = async (req, res) => {
   try {
-    const { error } = updatedOrderSchema.validate(req.body);
+    const { orderId } = req.params;
+    const { error } = updatedOrderSchema.validate({ ...req.body, orderId });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.orderId,
+      orderId,
       {
         $set: req.body,
       },
@@ -99,42 +116,53 @@ const updateOrder = async (req, res) => {
 //DELETE
 const deleteOrder = async (req, res) => {
   try {
-    const { error } = deletedOrderSchema.validate(req.body);
+    const { orderId } = req.params;
+    const { error } = deletedOrderSchema.validate({ orderId });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
-    await Order.findByIdAndDelete(req.params.orderId);
+    await Order.findByIdAndDelete(orderId);
     res.status(200).json("Order has been deleted...");
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-//GET USER ORDERS
-const getUserOrderByOrderId = async (req, res) => {
-  try {
-    const orders = await Order.findOne({ _id: req.params.orderId });
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
-
-//GET USER ORDERS
-const getUserOrderByUserId = async (req, res) => {
+//GET single ORDER
+const getOrder = async (req, res) => {
   try {
     const userId = req.user._id;
-    const orders = await Order.findOne({ userId });
-    res.status(200).json(orders);
+    const { orderId } = req.params;
+    const { error } = getOrderSchema.validate({ ...req.body, orderId });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    const orders = await Order.find({ userId });
+    if (orders.length === 0) {
+      return res.status(404).json("No order found of current User");
+    }
+    const singleOrder = orders.find((item) => {
+      return item._id.toString() === orderId.toString();
+    });
+
+    if (!singleOrder) {
+      return res.status(404).json("No order found with given orderId");
+    }
+
+    res.status(200).json(singleOrder);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json(err.message || "Internal server error! ");
   }
 };
 
-//GET ALL
+//GET all ORDERS
 const getAllOrder = async (req, res) => {
   try {
-    const orders = await Order.find();
+    const userId = req.user._id;
+    const orders = await Order.find({ userId });
+    if (orders.length === 0) {
+      return res.status(404).json("No order found of current User");
+    }
     res.status(200).json(orders);
   } catch (err) {
     res.status(500).json(err);
@@ -145,7 +173,6 @@ module.exports = {
   addOrder,
   updateOrder,
   deleteOrder,
-  getUserOrderByOrderId,
-  getUserOrderByUserId,
+  getOrder,
   getAllOrder,
 };

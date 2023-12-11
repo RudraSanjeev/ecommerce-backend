@@ -12,6 +12,7 @@ const addOrderSchema = Joi.object({
 });
 
 const updatedOrderSchema = Joi.object({
+  orderId: Joi.string().trim().length(24).hex().required(),
   cart: Joi.string().trim().length(24).hex(),
   total: Joi.number().min(1).max(1000000),
   paymentMode: Joi.string()
@@ -30,9 +31,13 @@ const updatedOrderSchema = Joi.object({
 const deletedOrderSchema = Joi.object({
   orderId: Joi.string().trim().length(24).hex().required(),
 });
+const getOrderSchema = Joi.object({
+  orderId: Joi.string().trim().length(24).hex().required(),
+});
 
 module.exports = {
   addOrderSchema,
   updatedOrderSchema,
   deletedOrderSchema,
+  getOrderSchema,
 };
