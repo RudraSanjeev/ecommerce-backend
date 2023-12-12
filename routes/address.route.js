@@ -11,10 +11,10 @@ const {
 // add
 router.post("/", verifyAndAuthorize, addAddress);
 
-// delete
+// update
 router.patch("/:addressId", verifyAndAuthorize, updateAddress);
 
-// get  address by userid
+// delete
 router.delete("/:addressId", verifyAndAuthorize, deleteAddress);
 
 // getAddress all

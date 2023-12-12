@@ -51,8 +51,8 @@ const addWishList = async (req, res) => {
   }
 };
 
-// update;
-const updateWishlist = async (req, res) => {
+// delete;
+const deleteWishlist = async (req, res) => {
   try {
     const productId = req.params.productId;
 
@@ -69,8 +69,9 @@ const updateWishlist = async (req, res) => {
       return res.status(404).json("Wishlist not found !");
     }
 
-    const existingItem = wishlist.items.find((item) =>
-      item.productId.equals(productId)
+    const existingItem = wishlist.items.find(
+      (item) => item.productId.equals(productId)
+      // item.productId.toString() === productId.toString()
     );
 
     if (!existingItem) {
@@ -100,6 +101,6 @@ const getWishList = async (req, res) => {
 
 module.exports = {
   addWishList,
-  updateWishlist,
+  deleteWishlist,
   getWishList,
 };

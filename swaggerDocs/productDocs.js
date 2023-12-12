@@ -1,5 +1,16 @@
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: token
+ *       description: Use the "Bearer" authentication scheme. Provide the token in the format "Bearer [jwt_token]".
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Product
  *   description: Operations related to products
@@ -78,6 +89,8 @@
  *   post:
  *     summary: Add a new product
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -103,6 +116,8 @@
  *   patch:
  *     summary: Update a product
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: productId
@@ -137,6 +152,8 @@
  *   delete:
  *     summary: Delete a product
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: productId
@@ -161,6 +178,8 @@
  *   get:
  *     summary: Get details of a product
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: productId
@@ -185,10 +204,12 @@
 
 /**
  * @swagger
- * /api/products:
+ * /api/products/all:
  *   get:
  *     summary: Get all products
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -235,6 +256,8 @@
  *   get:
  *     summary: Search for products based on a keyword
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: keyword

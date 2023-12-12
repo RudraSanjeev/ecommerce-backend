@@ -1,119 +1,127 @@
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: token
+ *       description: Use the "Bearer" authentication scheme. Provide the token in the format "Bearer [jwt_token]".
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Order
- *   description: Operations related to user orders
+ *   description: Operations related to orders
  *
  * components:
  *   schemas:
+ *     OrderItem:
+ *       type: object
+ *       properties:
+ *         productId:
+ *           type: string
+ *           description: The ID of the product in the order
+ *         quantity:
+ *           type: integer
+ *           description: The quantity of the product in the order
+ *       required:
+ *         - productId
+ *         - quantity
+ *       example:
+ *          paymentMode: "Credit Card"
+ *
  *     Order:
  *       type: object
  *       properties:
  *         _id:
  *           type: string
- *           description: The auto-generated ID of the order
+ *           description: The ID of the order
  *         userId:
  *           type: string
- *           description: The ID of the user placing the order
+ *           description: The ID of the user who placed the order
  *         cart:
  *           type: string
- *           description: The ID of the cart associated with the order
+ *           description: The ID of the associated cart
  *         total:
  *           type: number
  *           description: The total price of the order
  *         paymentToken:
  *           type: string
- *           description: The payment token associated with the order
+ *           description: The payment token for the order
  *         paymentStatus:
  *           type: string
- *           enum: [success, pending, failed]
  *           description: The payment status of the order
- *       required:
- *         - userId
- *         - cart
- *         - total
- *         - paymentToken
- *         - paymentStatus
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/OrderItem'
+ *           description: Array of items in the order
  *       example:
- *         _id: order123
- *         userId: user123
- *         cart: cart123
- *         total: 100.0
- *         paymentToken: stripeToken123
- *         paymentStatus: success
+ *         _id: "order_id_here"
+ *         userId: "user_id_here"
+ *         cart: "cart_id_here"
+ *         total: 20.00
+ *         paymentToken: "payment_token_here"
+ *         paymentStatus: "success"
+ *         items:
+ *           - productId: "product_id_here"
+ *             quantity: 2
  *
- *     UpdatedOrder:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *           description: The auto-generated ID of the updated order
- *         userId:
- *           type: string
- *           description: The ID of the user placing the updated order
- *         cart:
- *           type: string
- *           description: The ID of the cart associated with the updated order
- *         total:
- *           type: number
- *           description: The updated total price of the order
- *         paymentToken:
- *           type: string
- *           description: The updated payment token associated with the order
- *         paymentStatus:
- *           type: string
- *           enum: [success, pending, failed]
- *           description: The updated payment status of the order
- *       example:
- *         _id: order123
- *         userId: user123
- *         cart: cart123
- *         total: 120.0
- *         paymentToken: stripeToken456
- *         paymentStatus: pending
+ *   parameters:
+ *     orderId:
+ *       in: path
+ *       name: orderId
+ *       required: true
+ *       schema:
+ *         type: string
+ *       description: The ID of the order
  *
+ *   responses:
  *     GetOrderResponse:
  *       type: object
  *       properties:
  *         _id:
  *           type: string
- *           description: The auto-generated ID of the order
+ *           description: The ID of the order
  *         userId:
  *           type: string
- *           description: The ID of the user placing the order
+ *           description: The ID of the user who placed the order
  *         cart:
  *           type: string
- *           description: The ID of the cart associated with the order
+ *           description: The ID of the associated cart
  *         total:
  *           type: number
  *           description: The total price of the order
  *         paymentToken:
  *           type: string
- *           description: The payment token associated with the order
+ *           description: The payment token for the order
  *         paymentStatus:
  *           type: string
- *           enum: [success, pending, failed]
  *           description: The payment status of the order
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/OrderItem'
+ *           description: Array of items in the order
  *       example:
- *         _id: order123
- *         userId: user123
- *         cart: cart123
- *         total: 100.0
- *         paymentToken: stripeToken123
- *         paymentStatus: success
- *
- *     GetOrdersResponse:
- *       type: array
- *       items:
- *         $ref: '#/components/schemas/GetOrderResponse'
- *       description: Array of user orders
+ *         _id: "order_id_here"
+ *         userId: "user_id_here"
+ *         cart: "cart_id_here"
+ *         total: 20.00
+ *         paymentToken: "payment_token_here"
+ *         paymentStatus: "success"
+ *         items:
+ *           - productId: "product_id_here"
+ *             quantity: 2
  */
 
 /**
  * @swagger
- * /api/order:
+ * /api/orders:
  *   post:
- *     summary: Place a new order for the authenticated user
+ *     summary: Place a new order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -122,150 +130,118 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             $ref: '#/components/schemas/OrderItem'
  *     responses:
  *       201:
  *         description: Order placed successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/GetOrderResponse'
+ *               $ref: '#/components/schemas/Order'
  *       400:
  *         description: Bad request. Validation error or internal server error.
  *       404:
- *         description: Not Found. No items in the cart or address not added.
+ *         description: Not Found. Cart, user, or address not found.
  *       500:
  *         description: Internal server error.
  */
-// router.post("/order", authenticateToken, addOrder);
 
 /**
  * @swagger
- * /api/order/{orderId}:
+ * /api/orders/{orderId}:
  *   patch:
- *     summary: Update the order for the authenticated user
+ *     summary: Update an existing order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: orderId
- *         required: true
- *         description: The ID of the order to be updated
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/orderId'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             $ref: '#/components/schemas/OrderItem'
  *     responses:
  *       200:
  *         description: Order updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/UpdatedOrder'
+ *               $ref: '#/components/schemas/Order'
  *       400:
  *         description: Bad request. Validation error or internal server error.
+ *       404:
+ *         description: Not Found. Order not found.
  *       500:
  *         description: Internal server error.
  */
-// router.put("/order/{orderId}", authenticateToken, updateOrder);
 
 /**
  * @swagger
- * /api/order/{orderId}:
+ * /api/orders/{orderId}:
  *   delete:
- *     summary: Delete the order for the authenticated user
+ *     summary: Delete an order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: orderId
- *         required: true
- *         description: The ID of the order to be deleted
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/orderId'
  *     responses:
  *       200:
  *         description: Order deleted successfully
  *       400:
  *         description: Bad request. Validation error or internal server error.
+ *       404:
+ *         description: Not Found. Order not found.
  *       500:
  *         description: Internal server error.
  */
-// router.delete("/order/{orderId}", authenticateToken, deleteOrder);
 
 /**
  * @swagger
- * /api/order/{orderId}:
+ * /api/orders/all:
  *   get:
- *     summary: Get a specific order for the authenticated user
+ *     summary: Get all orders
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Not Found. No orders found.
+ *       500:
+ *         description: Internal server error.
+ */
+
+/**
+ * @swagger
+ * /api/orders/{orderId}:
+ *   get:
+ *     summary: Get a single order by ID
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: orderId
- *         required: true
- *         description: The ID of the order to be retrieved
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/orderId'
  *     responses:
  *       200:
  *         description: Order retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/GetOrderResponse'
+ *               $ref: '#/components/schemas/Order'
+ *       400:
+ *         description: Bad request. Validation error or internal server error.
  *       404:
- *         description: Not Found. Order not found for the authenticated user.
+ *         description: Not Found. Order not found.
  *       500:
  *         description: Internal server error.
  */
-router.get("/order/{orderId}", authenticateToken, getUserOrderByOrderId);
-
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Get all orders for the authenticated user
- *     tags: [Order]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Orders retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GetOrdersResponse'
- *       404:
- *         description: Not Found. No orders found for the authenticated user.
- *       500:
- *         description: Internal server error.
- */
-// router.get("/orders", authenticateToken, getUserOrderByUserId);
-
-/**
- * @swagger
- * /api/all-orders:
- *   get:
- *     summary: Get all orders (admin only)
- *     tags: [Order]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Orders retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GetOrdersResponse'
- *       500:
- *         description: Internal server error.
- */
-// router.get("/all-orders", authenticateAdmin, getAllOrder);

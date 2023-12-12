@@ -8,7 +8,6 @@ const {
   addCart,
   updatedCart,
   deletedCart,
-  // getCart,
   getAllCart,
 } = require("../controllers/cart.controller.js");
 // add
@@ -19,9 +18,6 @@ router.patch("/:productId", verifyAndAuthorize, updatedCart);
 
 // delete
 router.delete("/:productId", verifyAndAuthorize, deletedCart);
-
-// get single user cart
-// router.get("/", verifyAndAuthorize, getCart);
 
 // get all cart
 router.get("/all", verifyAndAdmin, getAllCart);

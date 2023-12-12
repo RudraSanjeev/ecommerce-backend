@@ -25,111 +25,111 @@ describe("addOrder function", () => {
     jest.clearAllMocks();
   });
 
-  // it("should add a new order successfully", async () => {
-  //   const req = {
-  //     body: {
-  //       // Add valid order data here
-  //       paymentMode: "Cash on delivery",
-  //     },
-  //     user: {
-  //       _id: "6570d8a32fe8748211793a2f",
-  //     },
-  //   };
+  it("should add a new order successfully", async () => {
+    const req = {
+      body: {
+        // Add valid order data here
+        paymentMode: "Cash on delivery",
+      },
+      user: {
+        _id: "6570d8a32fe8748211793a2f",
+      },
+    };
 
-  //   const res = {
-  //     status: jest.fn().mockReturnThis(),
-  //     json: jest.fn(),
-  //   };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-  //   const addOrderSchemaMock = {
-  //     validate: jest.fn().mockReturnValue({
-  //       error: null,
-  //     }),
-  //   };
+    const addOrderSchemaMock = {
+      validate: jest.fn().mockReturnValue({
+        error: null,
+      }),
+    };
 
-  //   const userMock = {
-  //     _id: "6570d8a32fe8748211793a2f",
-  //     email: "user@example.com",
-  //     // Add other user fields based on your schema
-  //   };
+    const userMock = {
+      _id: "6570d8a32fe8748211793a2f",
+      email: "user@example.com",
+      // Add other user fields based on your schema
+    };
 
-  //   const cartMock = {
-  //     _id: "6570d8a32fe8748211793a2f",
-  //     userId: "6570d8a32fe8748211793a2f",
-  //     items: [
-  //       {
-  //         productId: {
-  //           _id: "6570d8a32fe8748211793a2f",
-  //           currency: "USD",
-  //           // Add other product fields based on your schema
-  //         },
-  //         quantity: 2,
-  //       },
-  //     ],
-  //     totalPrice: 100,
-  //     // Add other cart fields based on your schema
-  //   };
+    const cartMock = {
+      _id: "6570d8a32fe8748211793a2f",
+      userId: "6570d8a32fe8748211793a2f",
+      items: [
+        {
+          productId: {
+            _id: "6570d8a32fe8748211793a2f",
+            currency: "USD",
+            // Add other product fields based on your schema
+          },
+          quantity: 2,
+        },
+      ],
+      totalPrice: 100,
+      // Add other cart fields based on your schema
+    };
 
-  //   const addressMock = {
-  //     userId: "6570d8a32fe8748211793a2f",
-  //     // Add other address fields based on your schema
-  //   };
+    const addressMock = {
+      userId: "6570d8a32fe8748211793a2f",
+      // Add other address fields based on your schema
+    };
 
-  //   const paymentIntentMock = {
-  //     id: "6570d8a32fe8748211793a2f",
-  //     client_secret: "6570d8a32fe8748211793a2f",
-  //     // Add other paymentIntent fields based on your schema
-  //   };
+    const paymentIntentMock = {
+      id: "6570d8a32fe8748211793a2f",
+      client_secret: "6570d8a32fe8748211793a2f",
+      // Add other paymentIntent fields based on your schema
+    };
 
-  //   const savedOrderMock = {
-  //     _id: "6570d8a32fe8748211793a2f",
-  //     userId: "6570d8a32fe8748211793a2f",
-  //     cart: "6570d8a32fe8748211793a2f",
-  //     total: 100,
-  //     paymentToken: "6570d8a32fe8748211793a2f",
-  //     paymentStatus: "success",
-  //     // Add other order fields based on your schema
-  //   };
+    const savedOrderMock = {
+      _id: "6570d8a32fe8748211793a2f",
+      userId: "6570d8a32fe8748211793a2f",
+      cart: "6570d8a32fe8748211793a2f",
+      total: 100,
+      paymentToken: "6570d8a32fe8748211793a2f",
+      paymentStatus: "success",
+      // Add other order fields based on your schema
+    };
 
-  //   addOrderSchemaMock.validate.mockReturnValue({
-  //     error: null,
-  //   });
-  //   User.findById.mockResolvedValue(userMock);
-  //   Cart.findOne.mockResolvedValue(cartMock);
-  //   Address.findOne.mockResolvedValue(addressMock);
-  //   stripe.paymentIntents.create.mockResolvedValue(paymentIntentMock);
-  //   Order.mockReturnValue({
-  //     save: jest.fn().mockResolvedValue(savedOrderMock),
-  //   });
+    addOrderSchemaMock.validate.mockReturnValue({
+      error: null,
+    });
+    User.findById.mockResolvedValue(userMock);
+    Cart.findOne.mockResolvedValue(cartMock);
+    Address.findOne.mockResolvedValue(addressMock);
+    stripe.paymentIntents.create.mockResolvedValue(paymentIntentMock);
+    Order.mockReturnValue({
+      save: jest.fn().mockResolvedValue(savedOrderMock),
+    });
 
-  //   await addOrder(req, res);
+    await addOrder(req, res);
 
-  //   expect(res.status).toHaveBeenCalledWith(201);
-  //   expect(res.json).toHaveBeenCalledWith({
-  //     newOrder: savedOrderMock,
-  //     cart: cartMock,
-  //     clientSecret: "clientSecret",
-  //   });
-  //   expect(Order).toHaveBeenCalledWith({
-  //     ...req.body,
-  //     userId: "userId",
-  //     cart: "cartId",
-  //     total: 100,
-  //     paymentToken: "6570d8a32fe8748211793a2f",
-  //     paymentStatus: "success",
-  //   });
-  //   expect(Product.findById).toHaveBeenCalledWith("6570d8a32fe8748211793a2f");
-  //   expect(Product.save).toHaveBeenCalled();
-  //   expect(Cart.findByIdAndDelete).toHaveBeenCalledWith(
-  //     "6570d8a32fe8748211793a2f"
-  //   );
-  //   expect(sendNotification).toHaveBeenCalledWith(
-  //     process.env.GMAIL_USER,
-  //     userMock.email,
-  //     "Order confirmed !",
-  //     "You have successfully placed an order !"
-  //   );
-  // });
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({
+      newOrder: savedOrderMock,
+      cart: cartMock,
+      clientSecret: "clientSecret",
+    });
+    expect(Order).toHaveBeenCalledWith({
+      ...req.body,
+      userId: "userId",
+      cart: "cartId",
+      total: 100,
+      paymentToken: "6570d8a32fe8748211793a2f",
+      paymentStatus: "success",
+    });
+    expect(Product.findById).toHaveBeenCalledWith("6570d8a32fe8748211793a2f");
+    expect(Product.save).toHaveBeenCalled();
+    expect(Cart.findByIdAndDelete).toHaveBeenCalledWith(
+      "6570d8a32fe8748211793a2f"
+    );
+    expect(sendNotification).toHaveBeenCalledWith(
+      process.env.GMAIL_USER,
+      userMock.email,
+      "Order confirmed !",
+      "You have successfully placed an order !"
+    );
+  });
   it("should add a new order successfully", async () => {
     const req = {
       body: {

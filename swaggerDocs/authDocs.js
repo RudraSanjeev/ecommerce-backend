@@ -1,5 +1,16 @@
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: token
+ *       description: Use the "Bearer" authentication scheme. Provide the token in the format "Bearer [jwt_token]".
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Authentication
  *   description: User registration and authentication

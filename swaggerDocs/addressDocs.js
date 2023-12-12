@@ -164,12 +164,19 @@ router.post("/address", authenticateToken, addAddress);
 
 /**
  * @swagger
- * /api/address:
+ * /api/address/{addressId}:
  *   delete:
  *     summary: Delete the address for the authenticated user
  *     tags: [Address]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the address
  *     responses:
  *       200:
  *         description: Address deleted successfully
@@ -182,12 +189,19 @@ router.post("/address", authenticateToken, addAddress);
 
 /**
  * @swagger
- * /api/address:
+ * /api/address/{addressId}:
  *   get:
  *     summary: Get the address for the authenticated user
  *     tags: [Address]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the address
  *     responses:
  *       200:
  *         description: Address retrieved successfully
@@ -204,7 +218,7 @@ router.post("/address", authenticateToken, addAddress);
 
 /**
  * @swagger
- * /api/addresses:
+ * /api/address/all:
  *   get:
  *     summary: Get all addresses for the authenticated user
  *     tags: [Address]

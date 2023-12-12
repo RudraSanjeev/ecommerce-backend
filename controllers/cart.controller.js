@@ -36,8 +36,10 @@ const addCart = async (req, res) => {
       return res.status(201).json(cart);
     }
     // Check if the product is already in the cart
-    const existingItem = cart.items.find((item) =>
-      item.productId.equals(productId)
+    const existingItem = cart.items.find(
+      (item) =>
+        // item.productId.equals(productId)
+        item.productId.toString() === productId.toString()
     );
 
     if (!existingItem) {
@@ -82,8 +84,8 @@ const updatedCart = async (req, res) => {
       return res.status(404).json("No cart found with the given user id");
     }
 
-    const existingItem = cart.items.find((item) =>
-      item.productId.equals(productId)
+    const existingItem = cart.items.find(
+      (item) => item.productId.toString() === productId.toString()
     );
 
     if (!existingItem) {

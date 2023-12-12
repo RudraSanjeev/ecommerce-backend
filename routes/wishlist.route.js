@@ -2,14 +2,14 @@ const { verifyAndAuthorize } = require("../middlewares/jwt/verifyToken.js");
 const router = require("express").Router();
 const {
   addWishList,
-  updateWishlist,
   getWishList,
+  deleteWishlist,
 } = require("../controllers/wishlist.controller.js");
 // add
 router.post("/", verifyAndAuthorize, addWishList);
 
-// update
-router.patch("/:productId", verifyAndAuthorize, updateWishlist);
+// delete
+router.delete("/:productId", verifyAndAuthorize, deleteWishlist);
 
 // get  order by userid
 router.get("/", verifyAndAuthorize, getWishList);

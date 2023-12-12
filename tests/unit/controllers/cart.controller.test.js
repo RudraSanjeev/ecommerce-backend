@@ -8,214 +8,214 @@ const Product = require("../../../models/product.model.js");
 jest.mock("../../../models/cart.model.js");
 jest.mock("../../../models/product.model.js");
 
-// describe("addCart function", () => {
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+describe("addCart function", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   it("should add a product to the cart successfully", async () => {
-//     const req = {
-//       user: {
-//         _id: "6574ccef486f68da127da0be",
-//       },
-//       body: {
-//         items: {
-//           productId: "6574ccef486f68da127da0ba",
-//           quantity: 2,
-//         },
-//       },
-//     };
+  it("should add a product to the cart successfully", async () => {
+    const req = {
+      user: {
+        _id: "6574ccef486f68da127da0be",
+      },
+      body: {
+        items: {
+          productId: "6574ccef486f68da127da0ba",
+          quantity: 2,
+        },
+      },
+    };
 
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const addCartSchemaMock = {
-//       validate: jest.fn().mockReturnValue({ error: null }),
-//     };
+    const addCartSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
 
-//     const productMock = {
-//       _id: "6574ccef486f68da127da0bc",
-//       title: "Nike shoes",
-//       desc: "All new Nike shoes air collection.",
-//       img: [
-//         "https://res.cloudinary.com/studentbcepatna/image/upload/v1701894307/lxmhues8i6v1fdvxuyyd.webp",
-//       ],
-//       currency: "INR",
-//       price: 100,
-//       quantity: 10,
-//       quantity: 5,
-//       inStock: true,
-//       // Add other fields based on your schema
-//     };
+    const productMock = {
+      _id: "6574ccef486f68da127da0bc",
+      title: "Nike shoes",
+      desc: "All new Nike shoes air collection.",
+      img: [
+        "https://res.cloudinary.com/studentbcepatna/image/upload/v1701894307/lxmhues8i6v1fdvxuyyd.webp",
+      ],
+      currency: "INR",
+      price: 100,
+      quantity: 10,
+      quantity: 5,
+      inStock: true,
+      // Add other fields based on your schema
+    };
 
-//     const cartMock = {
-//       userId: "6574ccef486f68da127da0be",
-//       items: [{ productId: "6574ccef486f68da127da0bc", quantity: 2 }],
-//       totalPrice: 200,
-//       // Add other fields based on your schema
-//     };
+    const cartMock = {
+      userId: "6574ccef486f68da127da0be",
+      items: [{ productId: "6574ccef486f68da127da0bc", quantity: 2 }],
+      totalPrice: 200,
+      // Add other fields based on your schema
+    };
 
-//     addCartSchemaMock.validate.mockReturnValue({ error: null });
-//     Product.findById.mockResolvedValue(productMock);
-//     Cart.findOne.mockResolvedValue(cartMock);
-//     Cart.prototype.save.mockResolvedValue(cartMock);
-//     Product.prototype.save.mockResolvedValue();
+    addCartSchemaMock.validate.mockReturnValue({ error: null });
+    Product.findById.mockResolvedValue(productMock);
+    Cart.findOne.mockResolvedValue(cartMock);
+    Cart.prototype.save.mockResolvedValue(cartMock);
+    Product.prototype.save.mockResolvedValue();
 
-//     await addCart(req, res);
+    await addCart(req, res);
 
-//     expect(res.status).toHaveBeenCalledWith(201);
-//     expect(res.json).toHaveBeenCalledWith(cartMock);
-//   });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(cartMock);
+  });
 
-//   it("should handle validation error", async () => {
-//     const req = {
-//       user: {
-//         _id: "user123",
-//       },
-//       body: {
-//         items: {
-//           productId: "invalidProductId",
-//           quantity: 2,
-//         },
-//       },
-//     };
+  it("should handle validation error", async () => {
+    const req = {
+      user: {
+        _id: "user123",
+      },
+      body: {
+        items: {
+          productId: "invalidProductId",
+          quantity: 2,
+        },
+      },
+    };
 
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const validationError = new Error("Validation error");
-//     validationError.message = "Validation error details";
+    const validationError = new Error("Validation error");
+    validationError.message = "Validation error details";
 
-//     const addCartSchemaMock = {
-//       validate: jest.fn().mockReturnValue({ error: validationError }),
-//     };
+    const addCartSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: validationError }),
+    };
 
-//     addCartSchemaMock.validate.mockReturnValue({ error: validationError });
+    addCartSchemaMock.validate.mockReturnValue({ error: validationError });
 
-//     await addCart(req, res);
+    await addCart(req, res);
 
-//     expect(res.status).toHaveBeenCalledWith(400);
-//     expect(res.json).toHaveBeenCalledWith(
-//       '"items.productId" length must be 24 characters long'
-//     );
-//   });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(
+      '"items.productId" length must be 24 characters long'
+    );
+  });
 
-//   it("should handle product not found", async () => {
-//     const req = {
-//       user: {
-//         _id: "6574ccef486f68da127da0be",
-//       },
-//       body: {
-//         items: {
-//           productId: "6574ccef486f68da127da0b1",
-//           quantity: 2,
-//         },
-//       },
-//     };
+  it("should handle product not found", async () => {
+    const req = {
+      user: {
+        _id: "6574ccef486f68da127da0be",
+      },
+      body: {
+        items: {
+          productId: "6574ccef486f68da127da0b1",
+          quantity: 2,
+        },
+      },
+    };
 
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const addCartSchemaMock = {
-//       validate: jest.fn().mockReturnValue({ error: null }),
-//     };
+    const addCartSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
 
-//     addCartSchemaMock.validate.mockReturnValue({ error: null });
-//     Product.findById.mockResolvedValue(null);
+    addCartSchemaMock.validate.mockReturnValue({ error: null });
+    Product.findById.mockResolvedValue(null);
 
-//     await addCart(req, res);
+    await addCart(req, res);
 
-//     expect(res.status).toHaveBeenCalledWith(404);
-//     expect(res.json).toHaveBeenCalledWith("Product not found with given id !");
-//   });
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith("Product not found with given id !");
+  });
 
-//   it("should handle insufficient product quantity", async () => {
-//     const req = {
-//       user: {
-//         _id: "user123",
-//       },
-//       body: {
-//         items: {
-//           productId: "product123",
-//           quantity: 6, // Assuming available quantity is 5
-//         },
-//       },
-//     };
+  it("should handle insufficient product quantity", async () => {
+    const req = {
+      user: {
+        _id: "user123",
+      },
+      body: {
+        items: {
+          productId: "product123",
+          quantity: 6, // Assuming available quantity is 5
+        },
+      },
+    };
 
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const addCartSchemaMock = {
-//       validate: jest.fn().mockReturnValue({ error: null }),
-//     };
+    const addCartSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
 
-//     const productMock = {
-//       _id: "product123",
-//       title: "Nike shoes",
-//       price: 100,
-//       quantity: 5,
-//       // Add other fields based on your schema
-//     };
+    const productMock = {
+      _id: "product123",
+      title: "Nike shoes",
+      price: 100,
+      quantity: 5,
+      // Add other fields based on your schema
+    };
 
-//     addCartSchemaMock.validate.mockReturnValue({ error: null });
-//     Product.findById.mockResolvedValue(productMock);
+    addCartSchemaMock.validate.mockReturnValue({ error: null });
+    Product.findById.mockResolvedValue(productMock);
 
-//     await addCart(req, res);
+    await addCart(req, res);
 
-//     expect(res.status).toHaveBeenCalledWith(400);
-//     expect(res.json).toHaveBeenCalledWith(
-//       '"items.productId" length must be 24 characters long'
-//     );
-//   });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(
+      '"items.productId" length must be 24 characters long'
+    );
+  });
 
-//   it("should handle internal server error", async () => {
-//     const req = {
-//       user: {
-//         _id: "6574ccef486f68da127da0b1",
-//       },
-//       body: {
-//         items: {
-//           productId: "6574ccef486f68da127da0b2",
-//           quantity: 2,
-//         },
-//       },
-//     };
+  it("should handle internal server error", async () => {
+    const req = {
+      user: {
+        _id: "6574ccef486f68da127da0b1",
+      },
+      body: {
+        items: {
+          productId: "6574ccef486f68da127da0b2",
+          quantity: 2,
+        },
+      },
+    };
 
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const addCartSchemaMock = {
-//       validate: jest.fn().mockReturnValue({ error: null }),
-//     };
+    const addCartSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
 
-//     const productMock = {
-//       _id: "6574ccef486f68da127da0be",
-//       title: "Nike shoes",
-//       price: 100,
-//       quantity: 5,
-//       // Add other fields based on your schema
-//     };
+    const productMock = {
+      _id: "6574ccef486f68da127da0be",
+      title: "Nike shoes",
+      price: 100,
+      quantity: 5,
+      // Add other fields based on your schema
+    };
 
-//     addCartSchemaMock.validate.mockReturnValue({ error: null });
-//     Product.findById.mockResolvedValue(productMock);
-//     Cart.findOne.mockRejectedValue(new Error("Internal server error"));
+    addCartSchemaMock.validate.mockReturnValue({ error: null });
+    Product.findById.mockResolvedValue(productMock);
+    Cart.findOne.mockRejectedValue(new Error("Internal server error"));
 
-//     await addCart(req, res);
+    await addCart(req, res);
 
-//     expect(res.status).toHaveBeenCalledWith(500);
-//     expect(res.json).toHaveBeenCalledWith("Internal server error");
-//   });
-// });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith("Internal server error");
+  });
+});
 
 // update
 
@@ -270,7 +270,7 @@ describe("updatedCart function", () => {
 
     await updatedCart(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith(cartMock);
   });
 

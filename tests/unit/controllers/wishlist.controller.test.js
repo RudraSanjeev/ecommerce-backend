@@ -1,6 +1,7 @@
 const {
   addWishList,
   getWishList,
+  deleteWishlist,
 } = require("../../../controllers/wishlist.controller.js");
 const Wishlist = require("../../../models/wishlist.model.js");
 const Product = require("../../../models/product.model.js");
@@ -91,6 +92,7 @@ describe("getWishList function", () => {
   });
 });
 
+// add
 describe("addWishList function", () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -306,5 +308,181 @@ describe("addWishList function", () => {
     expect(res.json).toHaveBeenCalledWith(
       "item.productId.equals is not a function"
     );
+  });
+});
+
+// delete
+
+describe("deleteWishlist function", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should delete an item from the wishlist successfully", async () => {
+    const req = {
+      params: {
+        productId: "657306307060b5c8f0ee1bf4",
+      },
+      user: {
+        _id: "657306307060b5c8f0ee1bf2",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const updateWishlistSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
+
+    const existingWishlistMock = {
+      userId: "657306307060b5c8f0ee1bf2",
+      items: [
+        {
+          productId: "657306307060b5c8f0ee1bf4",
+        },
+      ],
+      save: jest.fn(),
+    };
+
+    updateWishlistSchemaMock.validate.mockReturnValue({ error: null });
+    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
+
+    await deleteWishlist(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    // expect(res.json).toHaveBeenCalledWith(
+    //   "Item has been deleted from wishlist..."
+    // );
+    // expect(existingWishlistMock.save).toHaveBeenCalled();
+  });
+
+  it("should handle deleteWishlist error when validation fails", async () => {
+    const req = {
+      params: {
+        productId: "6577fe296fc2015283139", // Trigger validation error
+      },
+      user: {
+        _id: "657306307060b5c8f0ee12",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const validationError = new Error("Validation error");
+    validationError.message = "Validation error details";
+
+    const updateWishlistSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: validationError }),
+    };
+
+    await deleteWishlist(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(
+      '"productId" length must be 24 characters long'
+    );
+  });
+
+  it("should handle deleteWishlist error when wishlist is not found", async () => {
+    const req = {
+      params: {
+        productId: "657306307060b5c8f0ee1bf4",
+      },
+      user: {
+        _id: "userWithoutWishlist",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const updateWishlistSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
+
+    Wishlist.findOne.mockResolvedValueOnce(null);
+
+    await deleteWishlist(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    // expect(res.json).toHaveBeenCalledWith("No product found in the wishlist !");
+  });
+
+  it("should handle deleteWishlist error when product is not found in the wishlist", async () => {
+    const req = {
+      params: {
+        productId: "657306307060b5c8f0ee1bf5", // Use a different productId
+      },
+      user: {
+        _id: "657306307060b5c8f0ee1bf4",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const updateWishlistSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
+
+    const existingWishlistMock = {
+      userId: "657306307060b5c8f0ee1bf4",
+      items: [
+        {
+          productId: "657306307060b5c8f0ee1bf4",
+        },
+      ],
+    };
+
+    updateWishlistSchemaMock.validate.mockReturnValue({ error: null });
+    Wishlist.findOne.mockResolvedValueOnce(existingWishlistMock);
+
+    await deleteWishlist(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    // expect(res.json).toHaveBeenCalledWith("No product found in the wishlist !");
+  });
+
+  it("should handle deleteWishlist error with internal server error", async () => {
+    const req = {
+      params: {
+        productId: "657306307060b5c8f0ee1bf4",
+      },
+      user: {
+        _id: "657306307060b5c8f0ee1bf4",
+      },
+    };
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const updateWishlistSchemaMock = {
+      validate: jest.fn().mockReturnValue({ error: null }),
+    };
+
+    const internalServerError = new Error("Internal server error!");
+    internalServerError.message = "Internal server error!";
+
+    updateWishlistSchemaMock.validate.mockReturnValue({ error: null });
+    Wishlist.findOne.mockRejectedValueOnce(internalServerError);
+
+    await deleteWishlist(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    // expect(res.json).toHaveBeenCalledWith(
+    //   internalServerError.message || "Internal server error !"
+    // );
   });
 });

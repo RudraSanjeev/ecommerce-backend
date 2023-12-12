@@ -33,10 +33,10 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
-app.use("/api/product", productRoute);
-app.use("/api/cart", cartRoute);
-app.use("/api/wishlist", wishlistRoute);
-app.use("/api/order", orderRoute);
+app.use("/api/products", productRoute);
+app.use("/api/carts", cartRoute);
+app.use("/api/wishlists", wishlistRoute);
+app.use("/api/orders", orderRoute);
 app.use("/api/address", addressRoute);
 app.use((req, res) => {
   res.status(404).json("page not found !");

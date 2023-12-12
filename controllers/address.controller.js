@@ -50,12 +50,8 @@ const updateAddress = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
-    const { houseNo, landmark, city, pincode, state, country } =
-      updatedAddress._doc;
 
-    res
-      .status(201)
-      .json({ addressId, houseNo, landmark, city, pincode, state, country });
+    res.status(200).json(updatedAddress);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }
