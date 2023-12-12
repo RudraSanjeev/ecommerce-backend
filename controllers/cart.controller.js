@@ -120,8 +120,8 @@ const deletedCart = async (req, res) => {
     }
     const userId = req.user._id;
     const cart = await Cart.findOne({ userId });
-    const existingItem = cart.items.find((item) =>
-      item.productId.equals(productId)
+    const existingItem = cart.items.find(
+      (item) => item.productId.toString() === productId
     );
     if (!existingItem) {
       return res.status(404).json("No item found with given productId");
