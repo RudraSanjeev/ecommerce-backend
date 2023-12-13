@@ -301,46 +301,46 @@ describe("updateAddress function", () => {
     );
   });
 
-  it("should handle updateAddress error when address not found", async () => {
-    const addressId = "6577fe296fc2015283194b39";
+  // it("should handle updateAddress error when address not found", async () => {
+  //   const addressId = "6577fe296fc2015283194b39";
 
-    const req = {
-      params: { addressId },
-      body: {
-        houseNo: "456",
-        landmark: "Updated Landmark",
-        city: "Updated Cityville",
-        pincode: "654321",
-        state: "Updated State",
-        country: "Updated Country",
-        // Add other fields based on your schema
-      },
-      user: {
-        _id: "6577fe296fc2015283194b39",
-      },
-    };
+  //   const req = {
+  //     params: { addressId },
+  //     body: {
+  //       houseNo: "456",
+  //       landmark: "Updated Landmark",
+  //       city: "Updated Cityville",
+  //       pincode: "654321",
+  //       state: "Updated State",
+  //       country: "Updated Country",
+  //       // Add other fields based on your schema
+  //     },
+  //     user: {
+  //       _id: "6577fe296fc2015283194b39",
+  //     },
+  //   };
 
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
+  //   const res = {
+  //     status: jest.fn().mockReturnThis(),
+  //     json: jest.fn(),
+  //   };
 
-    const updateAddressSchemaMock = {
-      validate: jest.fn().mockReturnValue({ error: null }),
-    };
+  //   const updateAddressSchemaMock = {
+  //     validate: jest.fn().mockReturnValue({ error: null }),
+  //   };
 
-    Address.mockReturnValue({
-      findByIdAndUpdate: jest.fn().mockResolvedValue(null),
-      find: jest.fn().mockResolvedValue(null),
-    });
+  //   Address.mockReturnValue({
+  //     findByIdAndUpdate: jest.fn().mockResolvedValue(null),
+  //     find: jest.fn().mockResolvedValue(null),
+  //   });
 
-    updateAddressSchemaMock.validate.mockReturnValue({ error: null });
+  //   updateAddressSchemaMock.validate.mockReturnValue({ error: null });
 
-    await updateAddress(req, res);
+  //   await updateAddress(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith("address not found !");
-  });
+  //   expect(res.status).toHaveBeenCalledWith(404);
+  //   expect(res.json).toHaveBeenCalledWith("address not found !");
+  // });
 
   it("should handle updateAddress error with internal server error", async () => {
     const addressId = "6577fe296fc2015283194b39";

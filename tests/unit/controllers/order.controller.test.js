@@ -7,7 +7,7 @@ const Cart = require("../../../models/cart.model.js");
 const Address = require("../../../models/address.model.js");
 const Product = require("../../../models/product.model.js");
 const stripe = require("stripe")(process.env.STRIPE_SEC);
-console.log(process.env.STRIPE_SEC);
+// console.log(process.env.STRIPE_SEC);
 const {
   sendNotification,
 } = require("../../../middlewares/nodemailer/sendMail.js");
@@ -17,7 +17,7 @@ jest.mock("../../../models/user.model.js");
 jest.mock("../../../models/cart.model.js");
 jest.mock("../../../models/address.model.js");
 jest.mock("../../../models/product.model.js");
-jest.mock("stripe");
+jest.mock("stripe")(process.env.STRIPE_SEC);
 jest.mock("../../../middlewares/nodemailer/sendMail.js");
 
 describe("addOrder function", () => {

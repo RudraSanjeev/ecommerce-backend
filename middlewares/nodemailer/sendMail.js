@@ -26,11 +26,7 @@ const sendNotification = (senderMail, receiverMail, subject, text) => {
   // send mail with defined transport object
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error(error);
-    } else {
-      console.log("Message sent: %s", info.messageId);
-      // Preview only available when sending through an Ethereal account
-      console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+      throw new Error("Mail not sent !");
     }
   });
 };

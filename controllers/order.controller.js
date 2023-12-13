@@ -11,6 +11,74 @@ const {
   getOrderSchema,
 } = require("../validators/order.validation.js");
 const Product = require("../models/product.model.js");
+
+//CREATE
+const addOrder = async (req, res) => {
+  try {
+    const { error } = addOrderSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    // console.log(user);
+
+    const cart = await Cart.findOne({ userId })
+      .populate("items.productId")
+      .exec();
+    if (!cart) {
+      return res.status(404).json("No item in the cart!");
+    }
+
+    const address = await Address.findOne({ userId });
+
+    if (!address) {
+      return res.status(404).json("Please add your address to place an order!");
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: cart.totalPrice,
+      currency: cart.items[0].productId.currency,
+      // Add any additional options as needed
+    });
+
+    if (!paymentIntent) {
+      return res.status(400).json("payment not been done !");
+    }
+    // Create a new order with the paymentIntent id
+    const newOrder = new Order({
+      ...req.body,
+      userId,
+      cart: cart._id,
+      total: cart.totalPrice,
+      paymentToken: paymentIntent.id,
+      paymentStatus: "success",
+    });
+
+    await newOrder.save();
+
+    // update product collections
+    cart.items.forEach(async (item) => {
+      const product = await Product.findById(item.productId);
+      product.quantity -= item.quantity;
+      await product.save();
+    });
+    await Cart.findByIdAndDelete(cart._id);
+
+    sendNotification(
+      process.env.GMAIL_USER,
+      user.email,
+      "Order confirmed !",
+      `You have successfully place and order !`
+    );
+    res
+      .status(201)
+      .json({ newOrder, cart, clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error!");
+  }
+};
+// update
 const updateOrder = async (req, res) => {
   try {
     const { orderId } = req.params;

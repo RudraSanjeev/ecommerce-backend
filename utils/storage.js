@@ -1,5 +1,3 @@
-//cloudinary
-// Require the cloudinary library
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const dotenv = require("dotenv");
