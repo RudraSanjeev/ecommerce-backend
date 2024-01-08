@@ -7,6 +7,14 @@ const addressSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    fullName: {
+      type: String,
+      required: [true, "Please enter your full name"],
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "Please enter your Yor mobile number"],
+    },
     houseNo: {
       type: String,
       required: [true, "Please enter your house name/no"],

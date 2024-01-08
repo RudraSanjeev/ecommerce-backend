@@ -2,6 +2,8 @@ const Joi = require("joi");
 
 // add
 const addAddressSchema = Joi.object({
+  fullName: Joi.string().trim().required().min(3).max(20),
+  mobileNumber: Joi.string().trim().required().min(10).max(10),
   houseNo: Joi.string().trim().required().min(3).max(20),
   landmark: Joi.string().trim().required().min(10).max(100),
   city: Joi.string().trim().required().min(3).max(20),

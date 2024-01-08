@@ -1,13 +1,9 @@
 const Joi = require("joi");
 
 const registerSchema = Joi.object({
-  firstName: Joi.string().trim().required().min(3).max(20).message({
-    "string.min": "firstname must have at least of {#limit} characters !",
-    "string.max": "firstname must have at most of {#limit} characters !",
-  }),
-  lastName: Joi.string().trim().required().min(3).max(20).message({
-    "string.min": "lastname must have at least of {#limit} characters !",
-    "string.max": "lastname must have at most of {#limit} characters !",
+  fullName: Joi.string().trim().required().min(3).max(20).message({
+    "string.min": "fullName must have at least of {#limit} characters !",
+    "string.max": "fullName must have at most of {#limit} characters !",
   }),
   email: Joi.string()
     .trim()
@@ -28,15 +24,9 @@ const registerSchema = Joi.object({
     "string.length": "phone number must have of {#limit} length !",
     "string.required": "phone number is required !",
   }),
-  role: Joi.string()
-    .trim()
-    .valid("admin", "buyer")
-    .default("buyer")
-    .required()
-    .messages({
-      "string.valid": "role must have either admin or buyer",
-      "string.required": "role is required !",
-    }),
+  role: Joi.string().trim().valid("admin", "buyer").default("buyer").messages({
+    "string.valid": "role must have either admin or buyer",
+  }),
   passwordResetToken: Joi.string().trim().default(null),
 });
 
@@ -73,10 +63,14 @@ const updatePasswordSchema = Joi.object({
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
     .message("invalid password format !"),
 });
+const refreshAccessTokenShema = Joi.object({
+  refreshToken: Joi.string().trim().required(),
+});
 
 module.exports = {
   registerSchema,
   loginschema,
   resetPasswordSchema,
   updatePasswordSchema,
+  refreshAccessTokenShema,
 };

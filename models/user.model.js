@@ -2,19 +2,12 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    fullName: {
       type: String,
-      required: [true, "first name is required !"],
+      required: [true, "fullName is required !"],
       trim: true,
-      minLength: [3, "lastname must be atleast of 3 character"],
-      maxLength: [20, "lastname must be at most of 20 character"],
-    },
-    lastName: {
-      type: String,
-      required: [true, "lastname is required !"],
-      trim: true,
-      minLength: [3, "lastname must be atleast of 3 character"],
-      maxLength: [20, "lastname must be at most of 20 character"],
+      minLength: [3, "fullName must be atleast of 3 character"],
+      maxLength: [20, "fullName must be at most of 20 character"],
     },
     email: {
       type: String,
@@ -39,9 +32,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "buyer"],
       default: "buyer",
-      required: [true, "please select your role !"],
     },
     passwordResetToken: {
+      type: String,
+      default: null,
+    },
+    accessToken: {
       type: String,
       default: null,
     },

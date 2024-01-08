@@ -39,6 +39,7 @@ const generateRefreshAcessToken = (refreshToken) => {
     const newAccessToken = generateToken(user);
     return newAccessToken;
   } catch (err) {
+    console.log("some error occured sanjeev");
     throw err;
   }
 };
