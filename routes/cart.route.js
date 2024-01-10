@@ -20,6 +20,6 @@ router.patch("/:productId", verifyAndAuthorize, updatedCart);
 router.delete("/:productId", verifyAndAuthorize, deletedCart);
 
 // get all cart
-router.get("/all", verifyAndAdmin, getAllCart);
+router.get("/", verifyAndAdmin, getAllCart);
 
 module.exports = router;
