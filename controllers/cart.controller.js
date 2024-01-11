@@ -100,8 +100,9 @@ const updatedCart = async (req, res) => {
         .status(400)
         .json("given quantity is greator than product quantity !");
     }
+    const quantityChange = quantity - existingItem.quantity;
+    cart.totalPrice += quantityChange * product.price;
     existingItem.quantity = quantity;
-    cart.totalPrice = product.price * quantity;
     await cart.save();
     res.status(200).json(cart);
   } catch (err) {
@@ -110,7 +111,7 @@ const updatedCart = async (req, res) => {
   }
 };
 
-// delete cart -- not required
+// delete cart
 const deletedCart = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -126,9 +127,17 @@ const deletedCart = async (req, res) => {
     if (!existingItem) {
       return res.status(404).json("No item found with given productId");
     }
+    const deletedProduct = await Product.findOne({ _id: productId });
+    const deletedProductPrice = deletedProduct.price;
+    let deletedProductQuantity = 1;
     cart.items = cart.items.filter((item) => {
+      if (item.productId.toString() == productId.toString()) {
+        deletedProductQuantity = item.quantity;
+      }
       return item.productId.toString() !== productId.toString();
     });
+    cart.totalPrice =
+      cart.totalPrice - deletedProductQuantity * deletedProductPrice;
     await cart.save();
 
     res
