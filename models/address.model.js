@@ -11,7 +11,7 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please enter your full name"],
     },
-    phoneNumber: {
+    mobileNumber: {
       type: String,
       required: [true, "Please enter your Yor mobile number"],
     },

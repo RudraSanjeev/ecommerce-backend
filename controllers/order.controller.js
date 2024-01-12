@@ -26,6 +26,8 @@ const addOrder = async (req, res) => {
     const cart = await Cart.findOne({ userId })
       .populate("items.productId")
       .exec();
+
+    const cartItems = await Cart.findOne({ userId });
     if (!cart) {
       return res.status(404).json("No item in the cart!");
     }
@@ -49,7 +51,8 @@ const addOrder = async (req, res) => {
     const newOrder = new Order({
       ...req.body,
       userId,
-      cart: cart._id,
+      cart: cart,
+      items: cartItems.items,
       total: cart.totalPrice,
       paymentToken: paymentIntent.id,
       paymentStatus: "success",
@@ -73,7 +76,7 @@ const addOrder = async (req, res) => {
     );
     res
       .status(201)
-      .json({ newOrder, cart, clientSecret: paymentIntent.client_secret });
+      .json({ newOrder, clientSecret: paymentIntent.client_secret });
   } catch (err) {
     res.status(500).json(err.message || "Internal server error!");
   }
@@ -145,7 +148,9 @@ const getOrder = async (req, res) => {
 const getAllOrder = async (req, res) => {
   try {
     const userId = req.user._id;
-    const orders = await Order.find({ userId });
+    const orders = await Order.find({ userId })
+      .populate("items.productId")
+      .exec();
     if (orders.length === 0) {
       return res.status(404).json("No order found of current User");
     }
