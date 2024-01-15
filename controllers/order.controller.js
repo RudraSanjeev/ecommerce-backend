@@ -37,6 +37,16 @@ const addOrder = async (req, res) => {
     if (!address) {
       return res.status(404).json("Please add your address to place an order!");
     }
+    const { deliveryAddressId } = req.body;
+    const validAddressId = await Address.findOne({ _id: deliveryAddressId });
+    if (!validAddressId) {
+      return res
+        .status(404)
+        .json("Please give valid address id to place an order!");
+    }
+    if (validAddressId.userId.toString() !== userId.toString()) {
+      return res.status(400).json("this address is not associated with you !");
+    }
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cart.totalPrice,
@@ -48,13 +58,14 @@ const addOrder = async (req, res) => {
       return res.status(400).json("payment not been done !");
     }
     // Create a new order with the paymentIntent id
+    // console.log(paymentIntent.client_secret);
     const newOrder = new Order({
       ...req.body,
       userId,
       cart: cart,
       items: cartItems.items,
       total: cart.totalPrice,
-      paymentToken: paymentIntent.id,
+      paymentToken: paymentIntent.client_secret,
       paymentStatus: "success",
     });
 
@@ -149,7 +160,15 @@ const getAllOrder = async (req, res) => {
   try {
     const userId = req.user._id;
     const orders = await Order.find({ userId })
-      .populate("items.productId")
+      // .populate("items.productId", "deliveryAddressId")
+      .populate({
+        path: "items.productId",
+        model: "Product", // Replace 'Product' with the actual model name for the product
+      })
+      .populate({
+        path: "deliveryAddressId",
+        model: "Address", // Replace 'Address' with the actual model name for the address
+      })
       .exec();
     if (orders.length === 0) {
       return res.status(404).json("No order found of current User");

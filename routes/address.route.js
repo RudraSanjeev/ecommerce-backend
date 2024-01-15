@@ -18,7 +18,7 @@ router.patch("/:addressId", verifyAndAuthorize, updateAddress);
 router.delete("/:addressId", verifyAndAuthorize, deleteAddress);
 
 // getAddress all
-router.get("/all", verifyAndAuthorize, getAllAddressOfUser);
+router.get("/", verifyAndAuthorize, getAllAddressOfUser);
 
 // getAddress
 router.get("/:addressId", verifyAndAuthorize, getAddress);

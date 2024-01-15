@@ -12,6 +12,11 @@ const orderSchema = new mongoose.Schema(
       ref: "Cart",
       required: [true, "must have cart here !"],
     },
+    deliveryAddressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+      required: [true, "choose address to make an order !"],
+    },
     total: {
       type: Number,
       required: [true, "order must have total value !"],

@@ -5,6 +5,7 @@ const addOrderSchema = Joi.object({
     .trim()
     .valid("Credit Card", "Debit Card", "Cash on delivery")
     .required(),
+  deliveryAddressId: Joi.string().trim().length(24).hex().required(),
   orderStatus: Joi.string()
     .trim()
     .valid("pending", "successfull", "delivered", "cancelled")
@@ -14,6 +15,7 @@ const addOrderSchema = Joi.object({
 const updatedOrderSchema = Joi.object({
   orderId: Joi.string().trim().length(24).hex().required(),
   cart: Joi.string().trim().length(24).hex(),
+  deliveryAddressId: Joi.string().trim().length(24).hex().required(),
   total: Joi.number().min(1).max(1000000),
   paymentMode: Joi.string()
     .trim()

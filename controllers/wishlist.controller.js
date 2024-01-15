@@ -89,7 +89,9 @@ const deleteWishlist = async (req, res) => {
 const getWishList = async (req, res) => {
   try {
     const userId = req.user._id;
-    const wishlist = await Wishlist.findOne({ userId });
+    const wishlist = await Wishlist.findOne({ userId })
+      .populate("items.productId")
+      .exec();
     if (!wishlist) {
       return res.status(404).json("wishlist not found !");
     }

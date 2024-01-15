@@ -9,6 +9,7 @@ const { mongoose } = require("mongoose");
 // add
 const addAddress = async (req, res) => {
   try {
+    console.log(req.body.formData);
     const { error } = addAddressSchema.validate(req.body);
     if (error) {
       return res.status(400).json(error.message || "Bad request !");

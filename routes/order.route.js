@@ -20,7 +20,7 @@ router.patch("/:orderId", verifyAndAdmin, updateOrder);
 router.delete("/:orderId", verifyAndAdmin, deleteOrder);
 
 // get a user cart
-router.get("/", verifyAndAdmin, getAllOrder);
+router.get("/", verifyAndAuthorize, getAllOrder);
 
 // get  order by userid
 router.get("/:orderId", verifyAndAuthorize, getOrder);
