@@ -57,6 +57,40 @@ const updateAddress = async (req, res) => {
     res.status(500).json(err.message || "Internal server error !");
   }
 };
+const updateCurrentAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+
+    const { error } = updateAddressSchema.validate({ ...req.body, addressId });
+    if (error) {
+      return res.status(400).json(error.message || "Bad request !");
+    }
+    const userId = req.user._id;
+    const addresses = await Address.find({ userId });
+    if (!addresses) {
+      return res.status(404).json("address not found !");
+    }
+
+    // Update all addresses to set isCurrent to false
+    await Address.updateMany({ userId }, { $set: { isCurrent: false } });
+
+    // Set the isCurrent of the specific address to true
+    await Address.findOneAndUpdate(
+      { userId, _id: addressId },
+      { $set: { isCurrent: true } }
+    );
+
+    const updatedAddress = await Address.findByIdAndUpdate(
+      { _id: addressId },
+      { $set: req.body },
+      { new: true }
+    );
+
+    res.status(200).json(updatedAddress);
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error !");
+  }
+};
 
 const deleteAddress = async (req, res) => {
   try {
@@ -96,6 +130,18 @@ const getAddress = async (req, res) => {
     res.status(500).json(err.message || "Internal server error !");
   }
 };
+const getCurrentAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const address = await Address.findOne({ userId, isCurrent: true });
+    if (!address) {
+      return res.status(404).json("No address found of this user!");
+    }
+    res.status(200).json(address);
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error !");
+  }
+};
 
 // get address
 const getAllAddressOfUser = async (req, res) => {
@@ -111,7 +157,9 @@ const getAllAddressOfUser = async (req, res) => {
 module.exports = {
   addAddress,
   updateAddress,
+  updateCurrentAddress,
   deleteAddress,
   getAddress,
+  getCurrentAddress,
   getAllAddressOfUser,
 };
