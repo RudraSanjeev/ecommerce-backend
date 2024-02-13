@@ -18,7 +18,7 @@ router.patch("/:productId", verifyAndAdmin, updateProduct);
 router.delete("/:productId", verifyAndAdmin, deleteProduct);
 
 // get a product
-router.get("/all", getAllProduct);
+router.get("/", getAllProduct);
 
 // searching all matching product
 router.get("/search", searchAllMatchingProduct);
