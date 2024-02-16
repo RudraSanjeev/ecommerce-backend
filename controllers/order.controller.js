@@ -83,7 +83,7 @@ const addOrder = async (req, res) => {
       process.env.GMAIL_USER,
       user.email,
       "Order confirmed !",
-      `You have successfully place and order !`
+      `You have successfully place an order !`
     );
     res
       .status(201)
