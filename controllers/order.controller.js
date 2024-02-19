@@ -32,22 +32,15 @@ const addOrder = async (req, res) => {
       return res.status(404).json("No item in the cart!");
     }
 
-    const address = await Address.findOne({ userId });
-
-    if (!address) {
+    const addresses = await Address.find({ userId });
+    if (!addresses.length) {
       return res.status(404).json("Please add your address to place an order!");
     }
-    const { deliveryAddressId } = req.body;
-    const validAddressId = await Address.findOne({ _id: deliveryAddressId });
-    if (!validAddressId) {
-      return res
-        .status(404)
-        .json("Please give valid address id to place an order!");
-    }
-    if (validAddressId.userId.toString() !== userId.toString()) {
-      return res.status(400).json("this address is not associated with you !");
-    }
+    const deliveryAddressId =
+      addresses.find((address) => address.isCurrent === true)?._id ||
+      addresses[0]._id;
 
+    console.log(deliveryAddressId);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cart.totalPrice,
       currency: cart.items[0].productId.currency,
@@ -61,6 +54,7 @@ const addOrder = async (req, res) => {
     // console.log(paymentIntent.client_secret);
     const newOrder = new Order({
       ...req.body,
+      deliveryAddressId,
       userId,
       cart: cart,
       items: cartItems.items,

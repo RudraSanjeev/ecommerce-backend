@@ -28,7 +28,7 @@ const addAddress = async (req, res) => {
 
     res.status(201).json(newAddress);
   } catch (err) {
-    res.status(500).json(err.message || "Internal server error !");
+    res.status(500).json(err || "Internal server error !");
   }
 };
 
@@ -61,13 +61,13 @@ const updateCurrentAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
 
-    const { error } = updateAddressSchema.validate({ ...req.body, addressId });
+    const { error } = updateAddressSchema.validate({ addressId });
     if (error) {
       return res.status(400).json(error.message || "Bad request !");
     }
     const userId = req.user._id;
     const addresses = await Address.find({ userId });
-    if (!addresses) {
+    if (!addresses.length) {
       return res.status(404).json("address not found !");
     }
 
@@ -75,18 +75,12 @@ const updateCurrentAddress = async (req, res) => {
     await Address.updateMany({ userId }, { $set: { isCurrent: false } });
 
     // Set the isCurrent of the specific address to true
-    await Address.findOneAndUpdate(
+    const currentAddress = await Address.findOneAndUpdate(
       { userId, _id: addressId },
-      { $set: { isCurrent: true } }
-    );
-
-    const updatedAddress = await Address.findByIdAndUpdate(
-      { _id: addressId },
-      { $set: req.body },
+      { $set: { isCurrent: true } },
       { new: true }
     );
-
-    res.status(200).json(updatedAddress);
+    res.status(200).json(currentAddress);
   } catch (err) {
     res.status(500).json(err.message || "Internal server error !");
   }

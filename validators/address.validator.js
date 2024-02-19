@@ -24,6 +24,7 @@ const updateAddressSchema = Joi.object({
   pincode: Joi.string().trim().length(6),
   state: Joi.string().trim(),
   country: Joi.string().trim(),
+  isCurrent: Joi.boolean().default(false),
 });
 
 module.exports = {

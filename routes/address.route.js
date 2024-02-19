@@ -15,7 +15,7 @@ router.post("/", verifyAndAuthorize, addAddress);
 
 // update
 router.patch("/:addressId", verifyAndAuthorize, updateAddress);
-// update
+// update current address
 router.patch("/current/:addressId", verifyAndAuthorize, updateCurrentAddress);
 
 // delete

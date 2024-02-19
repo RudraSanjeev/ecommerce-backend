@@ -5,7 +5,6 @@ const addOrderSchema = Joi.object({
     .trim()
     .valid("Credit Card", "Debit Card", "Cash on delivery")
     .required(),
-  deliveryAddressId: Joi.string().trim().length(24).hex().required(),
   orderStatus: Joi.string()
     .trim()
     .valid("pending", "successfull", "delivered", "cancelled")
