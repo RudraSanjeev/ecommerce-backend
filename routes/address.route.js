@@ -12,7 +12,6 @@ const {
 
 // add
 router.post("/", verifyAndAuthorize, addAddress);
-
 // update
 router.patch("/:addressId", verifyAndAuthorize, updateAddress);
 // update current address

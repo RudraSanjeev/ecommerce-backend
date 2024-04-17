@@ -40,7 +40,7 @@ const addOrder = async (req, res) => {
       addresses.find((address) => address.isCurrent === true)?._id ||
       addresses[0]._id;
 
-    console.log(deliveryAddressId);
+    // console.log(deliveryAddressId);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cart.totalPrice,
       currency: cart.items[0].productId.currency,
